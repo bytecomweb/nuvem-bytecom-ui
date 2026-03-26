@@ -58,9 +58,9 @@ export function createApiService(initialConfig: ApiServiceConfig = {}): ApiServi
 
   const setConfig = (nextConfig: ApiServiceConfig = {}) => {
     currentConfig = {
-      baseURL: nextConfig.baseURL ?? '',
-      prefix: nextConfig.prefix ?? '',
-      axios: nextConfig.axios,
+      baseURL: nextConfig.baseURL ?? currentConfig.baseURL,
+      prefix: nextConfig.prefix ?? currentConfig.prefix,
+      axios: nextConfig.axios ?? currentConfig.axios,
     }
 
     instance = axios.create({
@@ -92,6 +92,10 @@ export function createApiService(initialConfig: ApiServiceConfig = {}): ApiServi
 const defaultApiService = createApiService()
 
 export function configureApiService(config: ApiServiceConfig = {}) {
+  if (!Object.keys(config).length) {
+    return defaultApiService
+  }
+
   defaultApiService.setConfig(config)
   return defaultApiService
 }
