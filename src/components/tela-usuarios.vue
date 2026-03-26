@@ -167,17 +167,13 @@
   <ConfirmDialog />
 
   <Toast />
-
-  <ConfirmDialog />
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { useApiService } from '@/services/api';
-import { Button, Column, DataTable, Dialog, FloatLabel, InputText, Password, Select, Toast } from 'primevue';
 
 type CargoUsuario = 'ADMIN' | 'NORMAL' | 'GERENTE';
 type CampoFiltro = 'todos' | 'nome' | 'email';
@@ -274,8 +270,6 @@ try {
   confirmacao = noopConfirm;
 }
 
-const queryClient = useQueryClient();
-
 const buscaEmpresa = ref('');
 const empresaSelecionadaTopo = ref<EmpresaOpcao | undefined>(undefined);
 
@@ -322,6 +316,14 @@ const opcoesCargoForm = [
   { label: 'Normal', value: 'NORMAL' }
 ];
 
+const opcoesEmpresas = ref<EmpresaOpcao[]>([]);
+const estaCarregandoEmpresas = ref(false);
+
+const usuarios = ref<UsuarioTabela[]>([]);
+const total = ref(0);
+const estaCarregandoUsuarios = ref(false);
+const estaSalvandoUsuario = ref(false);
+
 const temFiltroAtivo = computed(() => {
   return (
     !!filtro.busca ||
@@ -331,46 +333,31 @@ const temFiltroAtivo = computed(() => {
   );
 });
 
-const queryEmpresas = useQuery({
-  queryKey: ['empresas-usuario', buscaEmpresa],
-  queryFn: async () => {
+async function carregarEmpresas() {
+  estaCarregandoEmpresas.value = true;
+  try {
     const { data } = await api.get<RespostaEmpresas>('/api/v1/usuarios/empresas', {
       params: { busca: buscaEmpresa.value || undefined }
     });
 
-    return data.dados.map((empresa) => ({
+    opcoesEmpresas.value = data.dados.map((empresa) => ({
       ...empresa,
       nomeVirtual: empresa.nomeRazao.length > 30 ? `${empresa.nomeRazao.slice(0, 30)}...` : empresa.nomeRazao
-    })) as EmpresaOpcao[];
-  },
-  staleTime: 30_000
-});
+    }));
+  } finally {
+    estaCarregandoEmpresas.value = false;
+  }
+}
 
-const opcoesEmpresas = computed(() => queryEmpresas.data.value || []);
-const estaCarregandoEmpresas = computed(() => queryEmpresas.isLoading.value || queryEmpresas.isFetching.value);
+async function carregarUsuarios() {
+  if (!empresaSelecionadaTopo.value?.id) {
+    usuarios.value = [];
+    total.value = 0;
+    return;
+  }
 
-const queryUsuarios = useQuery({
-  queryKey: [
-    'usuarios',
-    () => paginacao.paginaAtual,
-    () => paginacao.tamanhoPagina,
-    () => filtro.busca,
-    () => filtro.campo,
-    () => filtro.cargo,
-    () => empresaSelecionadaTopo.value?.id
-  ],
-  queryFn: async () => {
-    if (!empresaSelecionadaTopo.value?.id) {
-      return {
-        dados: [] as UsuarioTabela[],
-        paginacao: {
-          paginaAtual: paginacao.paginaAtual,
-          tamanhoPagina: paginacao.tamanhoPagina,
-          total: 0
-        }
-      };
-    }
-
+  estaCarregandoUsuarios.value = true;
+  try {
     const params: Record<string, unknown> = {
       pagina: paginacao.paginaAtual,
       tamanhoPagina: paginacao.tamanhoPagina,
@@ -385,83 +372,13 @@ const queryUsuarios = useQuery({
     }
 
     const { data } = await api.get<RespostaUsuarios>('/api/v1/usuarios', { params });
-    return data;
-  },
-  enabled: computed(() => !!empresaSelecionadaTopo.value),
-  staleTime: 10_000
-});
 
-const usuarios = computed(() => queryUsuarios.data.value?.dados || []);
-const total = computed(() => queryUsuarios.data.value?.paginacao?.total || 0);
-const estaCarregandoUsuarios = computed(() => queryUsuarios.isLoading.value || queryUsuarios.isFetching.value);
-
-const mutacaoCriarUsuario = useMutation({
-  mutationFn: async () => {
-    const payload = {
-      nome: formulario.nome,
-      email: formulario.email.trim().toLowerCase(),
-      cnpjCpf: somenteNumeros(formulario.cnpjCpf),
-      cargo: formulario.cargo,
-      senha: formulario.senha,
-      empresasParaAdicionar: empresaSelecionadaTopo.value
-        ? [{ id: empresaSelecionadaTopo.value.id, cargo: 'GERENTE' as const }]
-        : [],
-      sistemasParaAdicionar: []
-    };
-
-    await api.post('/api/v1/usuarios', payload);
-  },
-  onSuccess: async () => {
-    toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário cadastrado', life: 2500 });
-    modal.visivel = false;
-    await queryClient.invalidateQueries({ queryKey: ['usuarios'] });
-  },
-  onError: () => {
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao cadastrar usuário', life: 3000 });
+    usuarios.value = data.dados;
+    total.value = data.paginacao?.total || 0;
+  } finally {
+    estaCarregandoUsuarios.value = false;
   }
-});
-
-const mutacaoAtualizarUsuario = useMutation({
-  mutationFn: async () => {
-    const payload: Record<string, unknown> = {
-      nome: formulario.nome,
-      email: formulario.email.trim().toLowerCase(),
-      cnpjCpf: somenteNumeros(formulario.cnpjCpf),
-      cargo: formulario.cargo
-    };
-
-    if (formulario.senha) {
-      payload.senha = formulario.senha;
-    }
-
-    await api.patch(`/api/v1/usuarios/${modal.idUsuario}`, payload);
-  },
-  onSuccess: async () => {
-    toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário atualizado', life: 2500 });
-    modal.visivel = false;
-    await queryClient.invalidateQueries({ queryKey: ['usuarios'] });
-  },
-  onError: () => {
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar usuário', life: 3000 });
-  }
-});
-
-const mutacaoRemoverUsuario = useMutation({
-  mutationFn: async (idUsuario: number) => {
-    await api.delete(`/api/v1/usuarios/${idUsuario}`);
-  },
-  onSuccess: async () => {
-    toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário removido', life: 2500 });
-    await queryClient.invalidateQueries({ queryKey: ['usuarios'] });
-  },
-  onError: () => {
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao remover usuário', life: 3000 });
-  }
-});
-
-const estaSalvandoUsuario = computed(() => {
-  return mutacaoCriarUsuario.isPending.value || mutacaoAtualizarUsuario.isPending.value;
-});
+}
 
 function somenteNumeros(valor: string) {
   return valor.replace(/\D/g, '');
@@ -494,7 +411,7 @@ function abrirModalEditar(usuario: UsuarioTabela) {
 }
 
 function sincronizarUsuarios() {
-  queryClient.invalidateQueries({ queryKey: ['usuarios'] });
+  void carregarUsuarios();
 }
 
 function limparFiltros() {
@@ -521,10 +438,54 @@ function salvarUsuario() {
     return;
   }
 
-  if (modal.modo === 'criar') {
-    mutacaoCriarUsuario.mutate();
-  } else {
-    mutacaoAtualizarUsuario.mutate();
+  void salvarUsuarioRequest();
+}
+
+async function salvarUsuarioRequest() {
+  estaSalvandoUsuario.value = true;
+  try {
+    if (modal.modo === 'criar') {
+      const payload = {
+        nome: formulario.nome,
+        email: formulario.email.trim().toLowerCase(),
+        cnpjCpf: somenteNumeros(formulario.cnpjCpf),
+        cargo: formulario.cargo,
+        senha: formulario.senha,
+        empresasParaAdicionar: empresaSelecionadaTopo.value
+          ? [{ id: empresaSelecionadaTopo.value.id, cargo: 'GERENTE' as const }]
+          : [],
+        sistemasParaAdicionar: []
+      };
+
+      await api.post('/api/v1/usuarios', payload);
+      toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário cadastrado', life: 2500 });
+    } else {
+      const payload: Record<string, unknown> = {
+        nome: formulario.nome,
+        email: formulario.email.trim().toLowerCase(),
+        cnpjCpf: somenteNumeros(formulario.cnpjCpf),
+        cargo: formulario.cargo
+      };
+
+      if (formulario.senha) {
+        payload.senha = formulario.senha;
+      }
+
+      await api.patch(`/api/v1/usuarios/${modal.idUsuario}`, payload);
+      toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário atualizado', life: 2500 });
+    }
+
+    modal.visivel = false;
+    await carregarUsuarios();
+  } catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: modal.modo === 'criar' ? 'Falha ao cadastrar usuário' : 'Falha ao atualizar usuário',
+      life: 3000
+    });
+  } finally {
+    estaSalvandoUsuario.value = false;
   }
 }
 
@@ -534,12 +495,28 @@ function confirmarRemocao(usuario: UsuarioTabela) {
     message: `Você tem certeza que deseja remover o usuário ${usuario.nome}?`,
     acceptProps: { label: 'Remover', severity: 'danger' },
     rejectProps: { label: 'Cancelar', severity: 'secondary' },
-    accept: () => mutacaoRemoverUsuario.mutate(usuario.id)
+    accept: async () => {
+      try {
+        await api.delete(`/api/v1/usuarios/${usuario.id}`);
+        toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário removido', life: 2500 });
+        await carregarUsuarios();
+      } catch {
+        toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao remover usuário', life: 3000 });
+      }
+    }
   });
 }
 
 watch(empresaSelecionadaTopo, () => {
   paginacao.paginaAtual = 1;
-  sincronizarUsuarios();
+  void carregarUsuarios();
+});
+
+watch(buscaEmpresa, () => {
+  void carregarEmpresas();
+});
+
+onMounted(() => {
+  void carregarEmpresas();
 });
 </script>
