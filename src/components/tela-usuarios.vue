@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen bg-white">
+  <!-- <div class="h-screen bg-white"> -->
     <header class="border-b p-3 flex justify-between items-center gap-3">
       <h2>Usuários</h2>
 
@@ -103,7 +103,7 @@
         </template>
       </DataTable>
     </main>
-  </div>
+  <!-- </div> -->
 
   <Dialog
     v-model:visible="modal.visivel"
@@ -267,6 +267,11 @@ function getRequestConfig(config: AxiosRequestConfig = {}): AxiosRequestConfig {
   };
 }
 
+async function apiRequest<T>(config: AxiosRequestConfig): Promise<T> {
+  const response = await api.request<T>(getRequestConfig(config));
+  return response.data;
+}
+
 const noopToast: ToastLike = {
   add: () => {}
 };
@@ -357,9 +362,11 @@ async function carregarEmpresas() {
   estaCarregandoEmpresas.value = true;
 
   try {
-    const { data } = await api.get<RespostaEmpresas>('/usuarios/empresas', getRequestConfig({
+    const data = await apiRequest<RespostaEmpresas>({
+      method: 'get',
+      url: '/usuarios/empresas',
       params: { busca: buscaEmpresa.value || undefined }
-    }));
+    });
 
     opcoesEmpresas.value = data.dados.map((empresa) => ({
       ...empresa,
@@ -392,7 +399,11 @@ async function carregarUsuarios() {
       params[filtro.campo] = filtro.busca;
     }
 
-    const { data } = await api.get<RespostaUsuarios>('/usuarios', getRequestConfig({ params }));
+    const data = await apiRequest<RespostaUsuarios>({
+      method: 'get',
+      url: '/usuarios',
+      params,
+    });
 
     usuarios.value = data.dados;
     total.value = data.paginacao?.total || 0;
@@ -478,7 +489,11 @@ async function salvarUsuarioRequest() {
         sistemasParaAdicionar: []
       };
 
-      await api.post('/usuarios', payload, getRequestConfig());
+      await apiRequest({
+        method: 'post',
+        url: '/usuarios',
+        data: payload,
+      });
       toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário cadastrado', life: 2500 });
     } else {
       const payload: Record<string, unknown> = {
@@ -492,7 +507,11 @@ async function salvarUsuarioRequest() {
         payload.senha = formulario.senha;
       }
 
-      await api.patch(`/usuarios/${modal.idUsuario}`, payload, getRequestConfig());
+      await apiRequest({
+        method: 'patch',
+        url: `/usuarios/${modal.idUsuario}`,
+        data: payload,
+      });
       toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário atualizado', life: 2500 });
     }
 
@@ -518,7 +537,10 @@ function confirmarRemocao(usuario: UsuarioTabela) {
     rejectProps: { label: 'Cancelar', severity: 'secondary' },
     accept: async () => {
       try {
-        await api.delete(`/usuarios/${usuario.id}`, getRequestConfig());
+        await apiRequest({
+          method: 'delete',
+          url: `/usuarios/${usuario.id}`,
+        });
         toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário removido', life: 2500 });
         await carregarUsuarios();
       } catch {
