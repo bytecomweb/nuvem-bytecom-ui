@@ -40,6 +40,36 @@ createApp(App)
   .mount("#app");
 ```
 
+Por padrao, o plugin tambem instala o `VueQueryPlugin` com um `QueryClient` interno.
+
+Se voce quiser reutilizar um `QueryClient` proprio do projeto consumidor:
+
+```ts
+import { QueryClient } from "@tanstack/vue-query";
+
+const queryClient = new QueryClient();
+
+createApp(App)
+  .use(NuvemBytecomUi, {
+    queryClient,
+    api: {
+      baseURL: import.meta.env.VITE_API_URL,
+      prefix: "api/v1",
+    },
+  })
+  .mount("#app");
+```
+
+Se precisar desabilitar a instalacao automatica do Vue Query:
+
+```ts
+createApp(App)
+  .use(NuvemBytecomUi, {
+    installVueQuery: false,
+  })
+  .mount("#app");
+```
+
 Ou com import pontual:
 
 ```ts
