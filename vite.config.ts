@@ -18,7 +18,7 @@ export default defineConfig({
       cssFileName: 'style',
     },
     rollupOptions: {
-      external: ['vue', /^primevue\//, /^@primeuix\//],
+      external: ['vue', /^primevue\//, /^@primeuix\//, /^@tanstack\/vue-query/],
       output: {
         exports: 'named',
         globals: {
