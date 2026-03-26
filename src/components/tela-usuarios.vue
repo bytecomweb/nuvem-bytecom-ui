@@ -1,109 +1,120 @@
 <template>
-  <!-- <div class="h-screen bg-white"> -->
-    <header class="border-b p-3 flex justify-between items-center gap-3">
-      <h2>Usuários</h2>
+  <header class="border-b p-3 flex justify-between items-center gap-3">
+    <h2>Usuários</h2>
 
-      <div class="flex items-center gap-3">
-        <Button
-          label="Cadastrar usuário"
-          icon="pi pi-plus"
-          @click="abrirModalCriar"
-        />
+    <div class="flex items-center gap-3">
+      <Button label="Cadastrar usuário" icon="pi pi-plus" @click="abrirModalCriar" />
 
-        <div class="w-[320px]">
-          <Select
-            v-model="empresaSelecionadaTopo"
-            :options="opcoesEmpresas"
-            option-label="nomeVirtual"
-            placeholder="Empresa selecionada"
-            filter
-            fluid
-            :loading="estaCarregandoEmpresas"
-            @show="buscaEmpresa = ''"
-            @filter="(e) => (buscaEmpresa = String(e.value || ''))"
-          >
-            <template #empty>
-              <p class="text-xs">Nenhuma empresa encontrada</p>
-            </template>
-            <template #emptyfilter>
-              <p class="text-xs">Nenhuma empresa encontrada</p>
-            </template>
-          </Select>
-        </div>
-      </div>
-    </header>
-
-    <main class="px-4 mt-5 pb-10">
-      <div class="flex items-center gap-3">
-        <div class="w-[320px] relative">
-          <InputText
-            v-model="filtro.busca"
-            fluid
-            type="text"
-            placeholder="Buscar..."
-            @keydown="(e) => e.key === 'Enter' && sincronizarUsuarios()"
-          />
-          <span
-            v-if="temFiltroAtivo"
-            class="pi pi-times absolute right-3 top-3 cursor-pointer"
-            @click="limparFiltros"
-          />
-        </div>
-
+      <div class="w-[320px]">
         <Select
-          v-model="filtro.campo"
-          :options="opcoesCampo"
-          option-label="label"
-          option-value="value"
-          placeholder="Buscar por"
-          class="w-[180px]"
-        />
-
-        <Select
-          v-model="filtro.cargo"
-          :options="opcoesCargo"
-          option-label="label"
-          option-value="value"
-          placeholder="Cargo"
-          class="w-[180px]"
-        />
-
-        <Button icon="pi pi-search" rounded @click="sincronizarUsuarios()" />
-      </div>
-
-      <DataTable
-        class="mt-5"
-        :value="usuarios"
-        lazy
-        paginator
-        :total-records="total"
-        :rows="paginacao.tamanhoPagina"
-        :rows-per-page-options="[5, 20, 50, 100]"
-        :loading="estaCarregandoUsuarios"
-        row-hover
-        @update:rows="(novo) => { paginacao.tamanhoPagina = novo; paginacao.paginaAtual = 1; sincronizarUsuarios(); }"
-        @page="(evt) => { paginacao.paginaAtual = evt.page + 1; sincronizarUsuarios(); }"
-        @row-click="(evt) => abrirModalEditar(evt.data)"
-      >
-        <Column field="nome" header="Nome" />
-        <Column field="email" header="E-mail" />
-        <Column field="cnpjCpf" header="CNPJ/CPF" />
-        <Column field="cargo" header="Cargo" />
-        <Column header="Ações" style="width: 140px">
-          <template #body="{ data }">
-            <div class="flex gap-2">
-              <Button icon="pi pi-pencil" text rounded @click.stop="abrirModalEditar(data)" />
-              <Button icon="pi pi-trash" text rounded severity="danger" @click.stop="confirmarRemocao(data)" />
-            </div>
+          v-model="empresaSelecionadaTopo"
+          :options="opcoesEmpresas"
+          option-label="nomeVirtual"
+          placeholder="Empresa selecionada"
+          filter
+          fluid
+          :loading="estaCarregandoEmpresas"
+          @show="buscaEmpresa = ''"
+          @filter="(e) => (buscaEmpresa = String(e.value || ''))"
+        >
+          <template #empty>
+            <p class="text-xs">Nenhuma empresa encontrada</p>
           </template>
-        </Column>
+          <template #emptyfilter>
+            <p class="text-xs">Nenhuma empresa encontrada</p>
+          </template>
+        </Select>
+      </div>
+    </div>
+  </header>
 
-        <template #empty>
-          <p>Nenhum usuário encontrado</p>
+  <main class="px-4 mt-5 pb-10">
+    <div class="flex items-center gap-3">
+      <div class="w-[320px] relative">
+        <InputText
+          v-model="filtro.busca"
+          fluid
+          type="text"
+          placeholder="Buscar..."
+          @keydown="(e) => e.key === 'Enter' && sincronizarUsuarios()"
+        />
+        <span
+          v-if="temFiltroAtivo"
+          class="pi pi-times absolute right-3 top-3 cursor-pointer"
+          @click="limparFiltros"
+        />
+      </div>
+
+      <Select
+        v-model="filtro.campo"
+        :options="opcoesCampo"
+        option-label="label"
+        option-value="value"
+        placeholder="Buscar por"
+        class="w-[180px]"
+      />
+
+      <Select
+        v-model="filtro.cargo"
+        :options="opcoesCargo"
+        option-label="label"
+        option-value="value"
+        placeholder="Cargo"
+        class="w-[180px]"
+      />
+
+      <Button icon="pi pi-search" rounded @click="sincronizarUsuarios()" />
+    </div>
+
+    <DataTable
+      class="mt-5"
+      :value="usuarios"
+      lazy
+      paginator
+      :total-records="total"
+      :rows="paginacao.tamanhoPagina"
+      :rows-per-page-options="[5, 20, 50, 100]"
+      :loading="estaCarregandoUsuarios"
+      row-hover
+      @update:rows="
+        (novo) => {
+          paginacao.tamanhoPagina = novo;
+          paginacao.paginaAtual = 1;
+          sincronizarUsuarios();
+        }
+      "
+      @page="
+        (evt) => {
+          paginacao.paginaAtual = evt.page + 1;
+          sincronizarUsuarios();
+        }
+      "
+      @row-click="(evt) => abrirModalEditar(evt.data)"
+    >
+      <Column field="nome" header="Nome" />
+      <Column field="email" header="E-mail" />
+      <Column field="cnpjCpf" header="CNPJ/CPF" />
+      <Column field="cargo" header="Cargo" />
+      <Column header="Ações" style="width: 140px">
+        <template #body="{ data }">
+          <div class="flex gap-2">
+            <Button icon="pi pi-pencil" text rounded @click.stop="abrirModalEditar(data)" />
+            <Button
+              icon="pi pi-trash"
+              text
+              rounded
+              severity="danger"
+              @click.stop="confirmarRemocao(data)"
+            />
+          </div>
         </template>
-      </DataTable>
-    </main>
-  <!-- </div> -->
+      </Column>
+
+      <template #empty>
+        <p>Nenhum usuário encontrado</p>
+      </template>
+    </DataTable>
+  </main>
 
   <Dialog
     v-model:visible="modal.visivel"
@@ -170,396 +181,420 @@
 </template>
 
 <script setup lang="ts">
-import type { AxiosRequestConfig, RawAxiosRequestHeaders } from 'axios';
-import { computed, onMounted, reactive, ref, watch } from 'vue';
-import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
-import { useApiService } from '@/services/api';
+  import type { AxiosRequestConfig, RawAxiosRequestHeaders } from 'axios';
+  import { computed, onMounted, reactive, ref, watch } from 'vue';
+  import { useConfirm } from 'primevue/useconfirm';
+  import { useToast } from 'primevue/usetoast';
+  import { useApiService } from '@/services/api';
 
-const props = defineProps<{
-  bearerToken?: string;
-}>();
+  const props = defineProps<{
+    bearerToken?: string;
+  }>();
 
-type CargoUsuario = 'ADMIN' | 'NORMAL' | 'GERENTE';
-type CampoFiltro = 'todos' | 'nome' | 'email';
+  type CargoUsuario = 'ADMIN' | 'NORMAL' | 'GERENTE';
+  type CampoFiltro = 'todos' | 'nome' | 'email';
 
-type EmpresaOpcao = {
-  id: number;
-  nomeRazao: string;
-  nomeFantasia: string;
-  cnpj: string;
-  status: string;
-  nomeVirtual: string;
-};
-
-type UsuarioTabela = {
-  id: number;
-  nome: string;
-  email: string;
-  cnpjCpf: string;
-  cargo: CargoUsuario;
-  empresas: Array<{
-    empresa: {
-      id: number;
-      nomeRazao: string;
-      nomeFantasia: string;
-      cnpj: string;
-    };
-    cargo: 'GERENTE' | 'NORMAL';
-  }>;
-  sistemas: Array<{
-    idEmpresa: number;
-    sistema: {
-      id: number;
-      nome: string;
-      imagem: string | null;
-      linkBackend: string | null;
-      linkFrontend: string | null;
-    };
-  }>;
-};
-
-type RespostaUsuarios = {
-  erro: boolean;
-  mensagem: string;
-  dados: UsuarioTabela[];
-  paginacao: {
-    paginaAtual: number;
-    tamanhoPagina: number;
-    total: number;
-  };
-};
-
-type RespostaEmpresas = {
-  erro: boolean;
-  mensagem: string;
-  dados: Array<{
+  type EmpresaOpcao = {
     id: number;
     nomeRazao: string;
     nomeFantasia: string;
     cnpj: string;
     status: string;
-  }>;
-};
-
-type ToastLike = {
-  add: (message: Record<string, unknown>) => void;
-};
-
-type ConfirmLike = {
-  require: (options: Record<string, unknown>) => void;
-};
-
-const api = useApiService().instance;
-
-function getRequestConfig(config: AxiosRequestConfig = {}): AxiosRequestConfig {
-  const headers: RawAxiosRequestHeaders = {
-    ...(config.headers as RawAxiosRequestHeaders | undefined),
+    nomeVirtual: string;
   };
 
-  if (props.bearerToken) {
-    headers.Authorization = `Bearer ${props.bearerToken}`;
-  }
-
-  return {
-    ...config,
-    headers,
+  type UsuarioTabela = {
+    id: number;
+    nome: string;
+    email: string;
+    cnpjCpf: string;
+    cargo: CargoUsuario;
+    empresas: Array<{
+      empresa: {
+        id: number;
+        nomeRazao: string;
+        nomeFantasia: string;
+        cnpj: string;
+      };
+      cargo: 'GERENTE' | 'NORMAL';
+    }>;
+    sistemas: Array<{
+      idEmpresa: number;
+      sistema: {
+        id: number;
+        nome: string;
+        imagem: string | null;
+        linkBackend: string | null;
+        linkFrontend: string | null;
+      };
+    }>;
   };
-}
 
-async function apiRequest<T>(config: AxiosRequestConfig): Promise<T> {
-  const response = await api.request<T>(getRequestConfig(config));
-  return response.data;
-}
+  type RespostaUsuarios = {
+    erro: boolean;
+    mensagem: string;
+    dados: UsuarioTabela[];
+    paginacao: {
+      paginaAtual: number;
+      tamanhoPagina: number;
+      total: number;
+    };
+  };
 
-const noopToast: ToastLike = {
-  add: () => {}
-};
+  type RespostaEmpresas = {
+    erro: boolean;
+    mensagem: string;
+    dados: Array<{
+      id: number;
+      nomeRazao: string;
+      nomeFantasia: string;
+      cnpj: string;
+      status: string;
+    }>;
+  };
 
-const noopConfirm: ConfirmLike = {
-  require: () => {}
-};
+  type ToastLike = {
+    add: (message: Record<string, unknown>) => void;
+  };
 
-let toast: ToastLike = noopToast;
-let confirmacao: ConfirmLike = noopConfirm;
+  type ConfirmLike = {
+    require: (options: Record<string, unknown>) => void;
+  };
 
-try {
-  toast = useToast() as ToastLike;
-} catch {
-  toast = noopToast;
-}
+  const api = useApiService().instance;
 
-try {
-  confirmacao = useConfirm() as ConfirmLike;
-} catch {
-  confirmacao = noopConfirm;
-}
-
-const buscaEmpresa = ref('');
-const empresaSelecionadaTopo = ref<EmpresaOpcao | undefined>(undefined);
-
-const filtro = reactive({
-  busca: '',
-  campo: 'todos' as CampoFiltro,
-  cargo: 'todos' as 'todos' | CargoUsuario
-});
-
-const paginacao = reactive({
-  paginaAtual: 1,
-  tamanhoPagina: 20
-});
-
-const modal = reactive({
-  visivel: false,
-  modo: 'criar' as 'criar' | 'editar',
-  idUsuario: 0
-});
-
-const formulario = reactive({
-  nome: '',
-  email: '',
-  cnpjCpf: '',
-  cargo: 'NORMAL' as 'ADMIN' | 'NORMAL',
-  senha: ''
-});
-
-const opcoesCampo = [
-  { label: 'Todos', value: 'todos' },
-  { label: 'Nome', value: 'nome' },
-  { label: 'E-mail', value: 'email' }
-];
-
-const opcoesCargo = [
-  { label: 'Todos', value: 'todos' },
-  { label: 'Admin', value: 'ADMIN' },
-  { label: 'Normal', value: 'NORMAL' },
-  { label: 'Gerente', value: 'GERENTE' }
-];
-
-const opcoesCargoForm = [
-  { label: 'Admin', value: 'ADMIN' },
-  { label: 'Normal', value: 'NORMAL' }
-];
-
-const opcoesEmpresas = ref<EmpresaOpcao[]>([]);
-const estaCarregandoEmpresas = ref(false);
-
-const usuarios = ref<UsuarioTabela[]>([]);
-const total = ref(0);
-const estaCarregandoUsuarios = ref(false);
-const estaSalvandoUsuario = ref(false);
-
-const temFiltroAtivo = computed(() => {
-  return (
-    !!filtro.busca ||
-    filtro.campo !== 'todos' ||
-    filtro.cargo !== 'todos' ||
-    !!empresaSelecionadaTopo.value
-  );
-});
-
-async function carregarEmpresas() {
-  estaCarregandoEmpresas.value = true;
-
-  try {
-    const data = await apiRequest<RespostaEmpresas>({
-      method: 'get',
-      url: '/usuarios/empresas',
-      params: { busca: buscaEmpresa.value || undefined }
-    });
-
-    opcoesEmpresas.value = data.dados.map((empresa) => ({
-      ...empresa,
-      nomeVirtual: empresa.nomeRazao.length > 30 ? `${empresa.nomeRazao.slice(0, 30)}...` : empresa.nomeRazao
-    }));
-  } finally {
-    estaCarregandoEmpresas.value = false;
-  }
-}
-
-async function carregarUsuarios() {
-  if (!empresaSelecionadaTopo.value?.id) {
-    usuarios.value = [];
-    total.value = 0;
-    return;
-  }
-
-  estaCarregandoUsuarios.value = true;
-  try {
-    const params: Record<string, unknown> = {
-      pagina: paginacao.paginaAtual,
-      tamanhoPagina: paginacao.tamanhoPagina,
-      empresas: true,
-      sistemas: true,
-      idEmpresa: empresaSelecionadaTopo.value.id,
-      cargo: filtro.cargo === 'todos' ? undefined : filtro.cargo
+  function getRequestConfig(config: AxiosRequestConfig = {}): AxiosRequestConfig {
+    const headers: RawAxiosRequestHeaders = {
+      ...(config.headers as RawAxiosRequestHeaders | undefined),
     };
 
-    if (filtro.campo !== 'todos' && filtro.busca) {
-      params[filtro.campo] = filtro.busca;
+    if (props.bearerToken) {
+      headers.Authorization = `Bearer ${props.bearerToken}`;
     }
 
-    const data = await apiRequest<RespostaUsuarios>({
-      method: 'get',
-      url: '/usuarios',
-      params,
-    });
-
-    usuarios.value = data.dados;
-    total.value = data.paginacao?.total || 0;
-  } finally {
-    estaCarregandoUsuarios.value = false;
-  }
-}
-
-function somenteNumeros(valor: string) {
-  return valor.replace(/\D/g, '');
-}
-
-function limparFormulario() {
-  formulario.nome = '';
-  formulario.email = '';
-  formulario.cnpjCpf = '';
-  formulario.cargo = 'NORMAL';
-  formulario.senha = '';
-  modal.idUsuario = 0;
-}
-
-function abrirModalCriar() {
-  modal.modo = 'criar';
-  limparFormulario();
-  modal.visivel = true;
-}
-
-function abrirModalEditar(usuario: UsuarioTabela) {
-  modal.modo = 'editar';
-  modal.idUsuario = usuario.id;
-  formulario.nome = usuario.nome;
-  formulario.email = usuario.email;
-  formulario.cnpjCpf = usuario.cnpjCpf;
-  formulario.cargo = usuario.cargo === 'ADMIN' ? 'ADMIN' : 'NORMAL';
-  formulario.senha = '';
-  modal.visivel = true;
-}
-
-function sincronizarUsuarios() {
-  void carregarUsuarios();
-}
-
-function limparFiltros() {
-  filtro.busca = '';
-  filtro.campo = 'todos';
-  filtro.cargo = 'todos';
-  empresaSelecionadaTopo.value = undefined;
-  paginacao.paginaAtual = 1;
-  sincronizarUsuarios();
-}
-
-function validarFormulario() {
-  if (!formulario.nome.trim()) return 'Informe o nome';
-  if (!formulario.email.trim()) return 'Informe o e-mail';
-  if (!formulario.cnpjCpf.trim()) return 'Informe o CNPJ/CPF';
-  if (modal.modo === 'criar' && !formulario.senha.trim()) return 'Informe a senha';
-  return null;
-}
-
-function salvarUsuario() {
-  const erroValidacao = validarFormulario();
-  if (erroValidacao) {
-    toast.add({ severity: 'warn', summary: 'Atenção', detail: erroValidacao, life: 2500 });
-    return;
+    return {
+      ...config,
+      headers,
+    };
   }
 
-  void salvarUsuarioRequest();
-}
+  async function apiRequest<T>(config: AxiosRequestConfig): Promise<T> {
+    const response = await api.request<T>(getRequestConfig(config));
+    return response.data;
+  }
 
-async function salvarUsuarioRequest() {
-  estaSalvandoUsuario.value = true;
+  const noopToast: ToastLike = {
+    add: () => {},
+  };
+
+  const noopConfirm: ConfirmLike = {
+    require: () => {},
+  };
+
+  let toast: ToastLike = noopToast;
+  let confirmacao: ConfirmLike = noopConfirm;
+
   try {
-    if (modal.modo === 'criar') {
-      const payload = {
-        nome: formulario.nome,
-        email: formulario.email.trim().toLowerCase(),
-        cnpjCpf: somenteNumeros(formulario.cnpjCpf),
-        cargo: formulario.cargo,
-        senha: formulario.senha,
-        empresasParaAdicionar: empresaSelecionadaTopo.value
-          ? [{ id: empresaSelecionadaTopo.value.id, cargo: 'GERENTE' as const }]
-          : [],
-        sistemasParaAdicionar: []
-      };
-
-      await apiRequest({
-        method: 'post',
-        url: '/usuarios',
-        data: payload,
-      });
-      toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário cadastrado', life: 2500 });
-    } else {
-      const payload: Record<string, unknown> = {
-        nome: formulario.nome,
-        email: formulario.email.trim().toLowerCase(),
-        cnpjCpf: somenteNumeros(formulario.cnpjCpf),
-        cargo: formulario.cargo
-      };
-
-      if (formulario.senha) {
-        payload.senha = formulario.senha;
-      }
-
-      await apiRequest({
-        method: 'patch',
-        url: `/usuarios/${modal.idUsuario}`,
-        data: payload,
-      });
-      toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário atualizado', life: 2500 });
-    }
-
-    modal.visivel = false;
-    await carregarUsuarios();
+    toast = useToast() as ToastLike;
   } catch {
-    toast.add({
-      severity: 'error',
-      summary: 'Erro',
-      detail: modal.modo === 'criar' ? 'Falha ao cadastrar usuário' : 'Falha ao atualizar usuário',
-      life: 3000
-    });
-  } finally {
-    estaSalvandoUsuario.value = false;
+    toast = noopToast;
   }
-}
 
-function confirmarRemocao(usuario: UsuarioTabela) {
-  confirmacao.require({
-    header: 'Remover usuário?',
-    message: `Você tem certeza que deseja remover o usuário ${usuario.nome}?`,
-    acceptProps: { label: 'Remover', severity: 'danger' },
-    rejectProps: { label: 'Cancelar', severity: 'secondary' },
-    accept: async () => {
-      try {
-        await apiRequest({
-          method: 'delete',
-          url: `/usuarios/${usuario.id}`,
-        });
-        toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário removido', life: 2500 });
-        await carregarUsuarios();
-      } catch {
-        toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao remover usuário', life: 3000 });
-      }
-    }
+  try {
+    confirmacao = useConfirm() as ConfirmLike;
+  } catch {
+    confirmacao = noopConfirm;
+  }
+
+  const buscaEmpresa = ref('');
+  const empresaSelecionadaTopo = ref<EmpresaOpcao | undefined>(undefined);
+
+  const filtro = reactive({
+    busca: '',
+    campo: 'todos' as CampoFiltro,
+    cargo: 'todos' as 'todos' | CargoUsuario,
   });
-}
 
-watch(empresaSelecionadaTopo, () => {
-  paginacao.paginaAtual = 1;
-  void carregarUsuarios();
-});
+  const paginacao = reactive({
+    paginaAtual: 1,
+    tamanhoPagina: 20,
+  });
 
-watch(buscaEmpresa, () => {
-  void carregarEmpresas();
-});
+  const modal = reactive({
+    visivel: false,
+    modo: 'criar' as 'criar' | 'editar',
+    idUsuario: 0,
+  });
 
-onMounted(() => {
-  void carregarEmpresas();
-});
+  const formulario = reactive({
+    nome: '',
+    email: '',
+    cnpjCpf: '',
+    cargo: 'NORMAL' as 'ADMIN' | 'NORMAL',
+    senha: '',
+  });
+
+  const opcoesCampo = [
+    { label: 'Todos', value: 'todos' },
+    { label: 'Nome', value: 'nome' },
+    { label: 'E-mail', value: 'email' },
+  ];
+
+  const opcoesCargo = [
+    { label: 'Todos', value: 'todos' },
+    { label: 'Admin', value: 'ADMIN' },
+    { label: 'Normal', value: 'NORMAL' },
+    { label: 'Gerente', value: 'GERENTE' },
+  ];
+
+  const opcoesCargoForm = [
+    { label: 'Admin', value: 'ADMIN' },
+    { label: 'Normal', value: 'NORMAL' },
+  ];
+
+  const opcoesEmpresas = ref<EmpresaOpcao[]>([]);
+  const estaCarregandoEmpresas = ref(false);
+
+  const usuarios = ref<UsuarioTabela[]>([]);
+  const total = ref(0);
+  const estaCarregandoUsuarios = ref(false);
+  const estaSalvandoUsuario = ref(false);
+
+  const temFiltroAtivo = computed(() => {
+    return (
+      !!filtro.busca ||
+      filtro.campo !== 'todos' ||
+      filtro.cargo !== 'todos' ||
+      !!empresaSelecionadaTopo.value
+    );
+  });
+
+  async function carregarEmpresas() {
+    estaCarregandoEmpresas.value = true;
+
+    try {
+      const data = await apiRequest<RespostaEmpresas>({
+        method: 'get',
+        url: '/usuarios/empresas',
+        params: { busca: buscaEmpresa.value || undefined },
+      });
+
+      opcoesEmpresas.value = data.dados.map((empresa) => ({
+        ...empresa,
+        nomeVirtual:
+          empresa.nomeRazao.length > 30
+            ? `${empresa.nomeRazao.slice(0, 30)}...`
+            : empresa.nomeRazao,
+      }));
+    } finally {
+      estaCarregandoEmpresas.value = false;
+    }
+  }
+
+  async function carregarUsuarios() {
+    if (!empresaSelecionadaTopo.value?.id) {
+      usuarios.value = [];
+      total.value = 0;
+      return;
+    }
+
+    estaCarregandoUsuarios.value = true;
+    try {
+      const params: Record<string, unknown> = {
+        pagina: paginacao.paginaAtual,
+        tamanhoPagina: paginacao.tamanhoPagina,
+        empresas: true,
+        sistemas: true,
+        idEmpresa: empresaSelecionadaTopo.value.id,
+        cargo: filtro.cargo === 'todos' ? undefined : filtro.cargo,
+      };
+
+      if (filtro.campo !== 'todos' && filtro.busca) {
+        params[filtro.campo] = filtro.busca;
+      }
+
+      const data = await apiRequest<RespostaUsuarios>({
+        method: 'get',
+        url: '/usuarios',
+        params,
+      });
+
+      usuarios.value = data.dados;
+      total.value = data.paginacao?.total || 0;
+    } finally {
+      estaCarregandoUsuarios.value = false;
+    }
+  }
+
+  function somenteNumeros(valor: string) {
+    return valor.replace(/\D/g, '');
+  }
+
+  function limparFormulario() {
+    formulario.nome = '';
+    formulario.email = '';
+    formulario.cnpjCpf = '';
+    formulario.cargo = 'NORMAL';
+    formulario.senha = '';
+    modal.idUsuario = 0;
+  }
+
+  function abrirModalCriar() {
+    modal.modo = 'criar';
+    limparFormulario();
+    modal.visivel = true;
+  }
+
+  function abrirModalEditar(usuario: UsuarioTabela) {
+    modal.modo = 'editar';
+    modal.idUsuario = usuario.id;
+    formulario.nome = usuario.nome;
+    formulario.email = usuario.email;
+    formulario.cnpjCpf = usuario.cnpjCpf;
+    formulario.cargo = usuario.cargo === 'ADMIN' ? 'ADMIN' : 'NORMAL';
+    formulario.senha = '';
+    modal.visivel = true;
+  }
+
+  function sincronizarUsuarios() {
+    void carregarUsuarios();
+  }
+
+  function limparFiltros() {
+    filtro.busca = '';
+    filtro.campo = 'todos';
+    filtro.cargo = 'todos';
+    empresaSelecionadaTopo.value = undefined;
+    paginacao.paginaAtual = 1;
+    sincronizarUsuarios();
+  }
+
+  function validarFormulario() {
+    if (!formulario.nome.trim()) return 'Informe o nome';
+    if (!formulario.email.trim()) return 'Informe o e-mail';
+    if (!formulario.cnpjCpf.trim()) return 'Informe o CNPJ/CPF';
+    if (modal.modo === 'criar' && !formulario.senha.trim()) return 'Informe a senha';
+    return null;
+  }
+
+  function salvarUsuario() {
+    const erroValidacao = validarFormulario();
+    if (erroValidacao) {
+      toast.add({ severity: 'warn', summary: 'Atenção', detail: erroValidacao, life: 2500 });
+      return;
+    }
+
+    void salvarUsuarioRequest();
+  }
+
+  async function salvarUsuarioRequest() {
+    estaSalvandoUsuario.value = true;
+    try {
+      if (modal.modo === 'criar') {
+        const payload = {
+          nome: formulario.nome,
+          email: formulario.email.trim().toLowerCase(),
+          cnpjCpf: somenteNumeros(formulario.cnpjCpf),
+          cargo: formulario.cargo,
+          senha: formulario.senha,
+          empresasParaAdicionar: empresaSelecionadaTopo.value
+            ? [{ id: empresaSelecionadaTopo.value.id, cargo: 'GERENTE' as const }]
+            : [],
+          sistemasParaAdicionar: [],
+        };
+
+        await apiRequest({
+          method: 'post',
+          url: '/usuarios',
+          data: payload,
+        });
+        toast.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Usuário cadastrado',
+          life: 2500,
+        });
+      } else {
+        const payload: Record<string, unknown> = {
+          nome: formulario.nome,
+          email: formulario.email.trim().toLowerCase(),
+          cnpjCpf: somenteNumeros(formulario.cnpjCpf),
+          cargo: formulario.cargo,
+        };
+
+        if (formulario.senha) {
+          payload.senha = formulario.senha;
+        }
+
+        await apiRequest({
+          method: 'patch',
+          url: `/usuarios/${modal.idUsuario}`,
+          data: payload,
+        });
+        toast.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Usuário atualizado',
+          life: 2500,
+        });
+      }
+
+      modal.visivel = false;
+      await carregarUsuarios();
+    } catch {
+      toast.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail:
+          modal.modo === 'criar' ? 'Falha ao cadastrar usuário' : 'Falha ao atualizar usuário',
+        life: 3000,
+      });
+    } finally {
+      estaSalvandoUsuario.value = false;
+    }
+  }
+
+  function confirmarRemocao(usuario: UsuarioTabela) {
+    confirmacao.require({
+      header: 'Remover usuário?',
+      message: `Você tem certeza que deseja remover o usuário ${usuario.nome}?`,
+      acceptProps: { label: 'Remover', severity: 'danger' },
+      rejectProps: { label: 'Cancelar', severity: 'secondary' },
+      accept: async () => {
+        try {
+          await apiRequest({
+            method: 'delete',
+            url: `/usuarios/${usuario.id}`,
+          });
+          toast.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: 'Usuário removido',
+            life: 2500,
+          });
+          await carregarUsuarios();
+        } catch {
+          toast.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Falha ao remover usuário',
+            life: 3000,
+          });
+        }
+      },
+    });
+  }
+
+  watch(empresaSelecionadaTopo, () => {
+    paginacao.paginaAtual = 1;
+    void carregarUsuarios();
+  });
+
+  watch(buscaEmpresa, () => {
+    void carregarEmpresas();
+  });
+
+  onMounted(() => {
+    void carregarEmpresas();
+  });
 </script>

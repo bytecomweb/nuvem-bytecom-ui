@@ -1,47 +1,47 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios'
-import { inject, type InjectionKey } from 'vue'
+import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
+import { inject, type InjectionKey } from 'vue';
 
 export interface ApiServiceConfig {
-  baseURL?: string
-  prefix?: string
-  axios?: AxiosRequestConfig
+  baseURL?: string;
+  prefix?: string;
+  axios?: AxiosRequestConfig;
 }
 
 export interface ApiService {
-  instance: AxiosInstance
+  instance: AxiosInstance;
   config: Required<Pick<ApiServiceConfig, 'baseURL' | 'prefix'>> & {
-    axios?: AxiosRequestConfig
-  }
-  setConfig: (config?: ApiServiceConfig) => AxiosInstance
+    axios?: AxiosRequestConfig;
+  };
+  setConfig: (config?: ApiServiceConfig) => AxiosInstance;
 }
 
-export const API_SERVICE_KEY = Symbol('NuvemBytecomApiService') as InjectionKey<ApiService>
+export const API_SERVICE_KEY = Symbol('NuvemBytecomApiService') as InjectionKey<ApiService>;
 
 function normalizeSegment(value?: string) {
   if (!value) {
-    return ''
+    return '';
   }
 
-  return value.replace(/^\/+|\/+$/g, '')
+  return value.replace(/^\/+|\/+$/g, '');
 }
 
 function buildBaseURL(baseURL?: string, prefix?: string) {
-  const normalizedBaseURL = (baseURL ?? '').replace(/\/+$/g, '')
-  const normalizedPrefix = normalizeSegment(prefix)
+  const normalizedBaseURL = (baseURL ?? '').replace(/\/+$/g, '');
+  const normalizedPrefix = normalizeSegment(prefix);
 
   if (!normalizedBaseURL && !normalizedPrefix) {
-    return ''
+    return '';
   }
 
   if (!normalizedBaseURL) {
-    return `/${normalizedPrefix}`
+    return `/${normalizedPrefix}`;
   }
 
   if (!normalizedPrefix) {
-    return normalizedBaseURL
+    return normalizedBaseURL;
   }
 
-  return `${normalizedBaseURL}/${normalizedPrefix}`
+  return `${normalizedBaseURL}/${normalizedPrefix}`;
 }
 
 export function createApiService(initialConfig: ApiServiceConfig = {}): ApiService {
@@ -49,61 +49,61 @@ export function createApiService(initialConfig: ApiServiceConfig = {}): ApiServi
     baseURL: initialConfig.baseURL ?? '',
     prefix: initialConfig.prefix ?? '',
     axios: initialConfig.axios,
-  }
+  };
 
   let instance = axios.create({
     ...currentConfig.axios,
     baseURL: buildBaseURL(currentConfig.baseURL, currentConfig.prefix),
-  })
+  });
 
   const setConfig = (nextConfig: ApiServiceConfig = {}) => {
     currentConfig = {
       baseURL: nextConfig.baseURL ?? currentConfig.baseURL,
       prefix: nextConfig.prefix ?? currentConfig.prefix,
       axios: nextConfig.axios ?? currentConfig.axios,
-    }
+    };
 
     instance = axios.create({
       ...currentConfig.axios,
       baseURL: buildBaseURL(currentConfig.baseURL, currentConfig.prefix),
-    })
+    });
 
-    service.instance = instance
+    service.instance = instance;
 
-    return instance
-  }
+    return instance;
+  };
 
   const service: ApiService = {
     get instance() {
-      return instance
+      return instance;
     },
     set instance(value: AxiosInstance) {
-      instance = value
+      instance = value;
     },
     get config() {
-      return currentConfig
+      return currentConfig;
     },
     setConfig,
-  }
+  };
 
-  return service
+  return service;
 }
 
-const defaultApiService = createApiService()
+const defaultApiService = createApiService();
 
 export function configureApiService(config: ApiServiceConfig = {}) {
   if (!Object.keys(config).length) {
-    return defaultApiService
+    return defaultApiService;
   }
 
-  defaultApiService.setConfig(config)
-  return defaultApiService
+  defaultApiService.setConfig(config);
+  return defaultApiService;
 }
 
 export function getApiService() {
-  return defaultApiService
+  return defaultApiService;
 }
 
 export function useApiService() {
-  return inject(API_SERVICE_KEY, defaultApiService)
+  return inject(API_SERVICE_KEY, defaultApiService);
 }
