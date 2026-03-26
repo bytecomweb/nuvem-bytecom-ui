@@ -170,6 +170,7 @@
 </template>
 
 <script setup lang="ts">
+import type { AxiosRequestConfig, RawAxiosRequestHeaders } from 'axios';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
@@ -251,13 +252,18 @@ type ConfirmLike = {
 
 const api = useApiService().instance;
 
-function getAuthHeaders() {
-  if (!props.bearerToken) {
-    return {};
+function getRequestConfig(config: AxiosRequestConfig = {}): AxiosRequestConfig {
+  const headers: RawAxiosRequestHeaders = {
+    ...(config.headers as RawAxiosRequestHeaders | undefined),
+  };
+
+  if (props.bearerToken) {
+    headers.Authorization = `Bearer ${props.bearerToken}`;
   }
 
   return {
-    Authorization: `Bearer ${props.bearerToken}`
+    ...config,
+    headers,
   };
 }
 
@@ -349,14 +355,11 @@ const temFiltroAtivo = computed(() => {
 
 async function carregarEmpresas() {
   estaCarregandoEmpresas.value = true;
-  
-  console.log(getAuthHeaders())
 
   try {
-    const { data } = await api.get<RespostaEmpresas>('/api/v1/usuarios/empresas', {
-      params: { busca: buscaEmpresa.value || undefined },
-      headers: getAuthHeaders()
-    });
+    const { data } = await api.get<RespostaEmpresas>('/usuarios/empresas', getRequestConfig({
+      params: { busca: buscaEmpresa.value || undefined }
+    }));
 
     opcoesEmpresas.value = data.dados.map((empresa) => ({
       ...empresa,
@@ -389,10 +392,7 @@ async function carregarUsuarios() {
       params[filtro.campo] = filtro.busca;
     }
 
-    const { data } = await api.get<RespostaUsuarios>('/api/v1/usuarios', {
-      params,
-      headers: getAuthHeaders()
-    });
+    const { data } = await api.get<RespostaUsuarios>('/usuarios', getRequestConfig({ params }));
 
     usuarios.value = data.dados;
     total.value = data.paginacao?.total || 0;
@@ -478,9 +478,7 @@ async function salvarUsuarioRequest() {
         sistemasParaAdicionar: []
       };
 
-      await api.post('/api/v1/usuarios', payload, {
-        headers: getAuthHeaders()
-      });
+      await api.post('/usuarios', payload, getRequestConfig());
       toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário cadastrado', life: 2500 });
     } else {
       const payload: Record<string, unknown> = {
@@ -494,9 +492,7 @@ async function salvarUsuarioRequest() {
         payload.senha = formulario.senha;
       }
 
-      await api.patch(`/api/v1/usuarios/${modal.idUsuario}`, payload, {
-        headers: getAuthHeaders()
-      });
+      await api.patch(`/usuarios/${modal.idUsuario}`, payload, getRequestConfig());
       toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário atualizado', life: 2500 });
     }
 
@@ -522,9 +518,7 @@ function confirmarRemocao(usuario: UsuarioTabela) {
     rejectProps: { label: 'Cancelar', severity: 'secondary' },
     accept: async () => {
       try {
-        await api.delete(`/api/v1/usuarios/${usuario.id}`, {
-          headers: getAuthHeaders()
-        });
+        await api.delete(`/usuarios/${usuario.id}`, getRequestConfig());
         toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário removido', life: 2500 });
         await carregarUsuarios();
       } catch {
