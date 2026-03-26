@@ -1,71 +1,46 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { onMounted } from 'vue';
+  import PlaygroundSidebar from './components/playground-sidebar.vue';
+  import PlaygroundViewer from './components/playground-viewer.vue';
+  import { setupMockApi } from './mocks/api-mock';
+
+  // Configurar mock de API
+  onMounted(() => {
+    setupMockApi();
+  });
+</script>
 
 <template>
-  <main class="playground">
-    <section class="hero">
-      <p class="eyebrow">PrimeVue starter</p>
-      <h1>Nuvem Bytecom UI</h1>
-      <p class="copy">
-        Base pronta para evoluir componentes compartilhados sobre PrimeVue, com build de biblioteca
-        e tipagem.
-      </p>
-      <div class="actions">
-        <UiButton label="Primary action" />
-        <UiButton label="Secondary action" variant="secondary" />
-      </div>
-    </section>
-  </main>
+  <div class="playground-layout">
+    <PlaygroundSidebar />
+    <PlaygroundViewer />
+  </div>
 </template>
 
-<style scoped>
-  .playground {
-    align-items: center;
-    background:
-      radial-gradient(circle at top, rgba(56, 189, 248, 0.2), transparent 35%),
-      linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-    display: grid;
-    min-height: 100vh;
-    padding: 2rem;
+<style>
+  * {
+    box-sizing: border-box;
   }
 
-  .hero {
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(148, 163, 184, 0.3);
-    border-radius: 24px;
-    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
-    margin: 0 auto;
-    max-width: 720px;
-    padding: 3rem;
-  }
-
-  .eyebrow {
-    color: #0369a1;
-    font-size: 0.875rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    margin: 0 0 0.75rem;
-    text-transform: uppercase;
-  }
-
-  h1 {
-    color: #0f172a;
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    line-height: 1;
+  html,
+  body,
+  #app {
+    height: 100%;
     margin: 0;
+    padding: 0;
   }
 
-  .copy {
-    color: #334155;
-    font-size: 1.125rem;
-    line-height: 1.6;
-    margin: 1rem 0 0;
-    max-width: 40ch;
+  body {
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+      'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-variant-ligatures: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  .actions {
+  .playground-layout {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 2rem;
+    height: 100vh;
   }
 </style>
