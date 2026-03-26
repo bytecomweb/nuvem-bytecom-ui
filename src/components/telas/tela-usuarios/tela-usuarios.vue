@@ -1,33 +1,8 @@
 <template>
-  <header class="border-b p-3 flex justify-between items-center gap-3">
-    <h2>Usuários</h2>
-
-    <div class="flex items-center gap-3">
-      <Button label="Cadastrar usuário" icon="pi pi-plus" @click="abrirModalCriar" />
-
-      <div class="w-[320px]">
-        <Select
-          v-model="empresaSelecionadaTopo"
-          :options="opcoesEmpresas"
-          option-label="nomeVirtual"
-          placeholder="Empresa selecionada"
-          filter
-          fluid
-          :loading="estaCarregandoEmpresas"
-          @show="buscaEmpresa = ''"
-          @filter="(e) => (buscaEmpresa = String(e.value || ''))"
-        >
-          <template #empty>
-            <p class="text-xs">Nenhuma empresa encontrada</p>
-          </template>
-          <template #emptyfilter>
-            <p class="text-xs">Nenhuma empresa encontrada</p>
-          </template>
-        </Select>
-      </div>
-    </div>
-  </header>
-
+  <TelaUsuariosCabecalho
+    v-model:empresa-selecionada="empresaSelecionada"
+    @criar="abrirModalCriar"
+  />
   <main class="px-4 mt-5 pb-10">
     <div class="flex items-center gap-3">
       <div class="w-[320px] relative">
@@ -186,6 +161,7 @@
   import { useConfirm } from 'primevue/useconfirm';
   import { useToast } from 'primevue/usetoast';
   import { useApiService } from '@/services/api';
+  import TelaUsuariosCabecalho from '@/components/telas/tela-usuarios/components/tela-usuarios-cabecalho.vue';
 
   const props = defineProps<{
     bearerToken?: string;
@@ -307,7 +283,7 @@
   }
 
   const buscaEmpresa = ref('');
-  const empresaSelecionadaTopo = ref<EmpresaOpcao | undefined>(undefined);
+  const empresaSelecionada = ref<EmpresaOpcao | undefined>(undefined);
 
   const filtro = reactive({
     busca: '',
@@ -365,7 +341,7 @@
       !!filtro.busca ||
       filtro.campo !== 'todos' ||
       filtro.cargo !== 'todos' ||
-      !!empresaSelecionadaTopo.value
+      !!empresaSelecionada.value
     );
   });
 
@@ -392,7 +368,7 @@
   }
 
   async function carregarUsuarios() {
-    if (!empresaSelecionadaTopo.value?.id) {
+    if (!empresaSelecionada.value?.id) {
       usuarios.value = [];
       total.value = 0;
       return;
@@ -405,7 +381,7 @@
         tamanhoPagina: paginacao.tamanhoPagina,
         empresas: true,
         sistemas: true,
-        idEmpresa: empresaSelecionadaTopo.value.id,
+        idEmpresa: empresaSelecionada.value.id,
         cargo: filtro.cargo === 'todos' ? undefined : filtro.cargo,
       };
 
@@ -464,7 +440,7 @@
     filtro.busca = '';
     filtro.campo = 'todos';
     filtro.cargo = 'todos';
-    empresaSelecionadaTopo.value = undefined;
+    empresaSelecionada.value = undefined;
     paginacao.paginaAtual = 1;
     sincronizarUsuarios();
   }
@@ -497,8 +473,8 @@
           cnpjCpf: somenteNumeros(formulario.cnpjCpf),
           cargo: formulario.cargo,
           senha: formulario.senha,
-          empresasParaAdicionar: empresaSelecionadaTopo.value
-            ? [{ id: empresaSelecionadaTopo.value.id, cargo: 'GERENTE' as const }]
+          empresasParaAdicionar: empresaSelecionada.value
+            ? [{ id: empresaSelecionada.value.id, cargo: 'GERENTE' as const }]
             : [],
           sistemasParaAdicionar: [],
         };
@@ -585,7 +561,7 @@
     });
   }
 
-  watch(empresaSelecionadaTopo, () => {
+  watch(empresaSelecionada, () => {
     paginacao.paginaAtual = 1;
     void carregarUsuarios();
   });

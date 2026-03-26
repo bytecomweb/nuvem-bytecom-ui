@@ -3,7 +3,7 @@ import PrimeVue from 'primevue/config';
 import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
 import type { App, Plugin } from 'vue';
-import TelaUsuarios from './components/tela-usuarios.vue';
+import TelaUsuarios from '@/components/telas/tela-usuarios/tela-usuarios.vue';
 import {
   API_SERVICE_KEY,
   configureApiService,

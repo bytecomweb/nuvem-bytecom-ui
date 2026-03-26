@@ -1,6 +1,4 @@
-<script setup lang="ts">
-  import { UiButton } from '@/index';
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <main class="playground">
