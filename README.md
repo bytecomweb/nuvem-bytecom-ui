@@ -35,6 +35,7 @@ createApp(App)
     api: {
       baseURL: import.meta.env.VITE_API_URL,
       prefix: "api/v1",
+      bearerToken: "seu-token-aqui",
     },
   })
   .mount("#app");
@@ -44,6 +45,20 @@ Ou com import pontual:
 
 ```ts
 import { UiButton } from "@nuvem-bytecom/ui";
+```
+
+Para a tela de usuarios, voce tambem pode passar o token diretamente no componente:
+
+```vue
+<template>
+  <TelaUsuarios :bearer-token="token" />
+</template>
+
+<script setup lang="ts">
+import { TelaUsuarios } from "@nuvem-bytecom/ui";
+
+const token = "seu-token-aqui";
+</script>
 ```
 
 ## API Service
@@ -56,6 +71,7 @@ createApp(App)
     api: {
       baseURL: "https://meu-backend.com",
       prefix: "api/admin",
+      bearerToken: "seu-token-aqui",
       axios: {
         timeout: 10000,
       },
@@ -63,6 +79,10 @@ createApp(App)
   })
   .mount("#app");
 ```
+
+Quando `bearerToken` for informado, o client adiciona automaticamente o header:
+
+- `Authorization: Bearer <token>`
 
 O `baseURL` final do client vira a composicao de `baseURL + prefix`.
 

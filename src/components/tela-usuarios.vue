@@ -175,6 +175,10 @@ import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { useApiService } from '@/services/api';
 
+const props = defineProps<{
+  bearerToken?: string;
+}>();
+
 type CargoUsuario = 'ADMIN' | 'NORMAL' | 'GERENTE';
 type CampoFiltro = 'todos' | 'nome' | 'email';
 
@@ -246,6 +250,16 @@ type ConfirmLike = {
 };
 
 const api = useApiService().instance;
+
+function getAuthHeaders() {
+  if (!props.bearerToken) {
+    return {};
+  }
+
+  return {
+    Authorization: `Bearer ${props.bearerToken}`
+  };
+}
 
 const noopToast: ToastLike = {
   add: () => {}
@@ -337,7 +351,8 @@ async function carregarEmpresas() {
   estaCarregandoEmpresas.value = true;
   try {
     const { data } = await api.get<RespostaEmpresas>('/api/v1/usuarios/empresas', {
-      params: { busca: buscaEmpresa.value || undefined }
+      params: { busca: buscaEmpresa.value || undefined },
+      headers: getAuthHeaders()
     });
 
     opcoesEmpresas.value = data.dados.map((empresa) => ({
@@ -371,7 +386,10 @@ async function carregarUsuarios() {
       params[filtro.campo] = filtro.busca;
     }
 
-    const { data } = await api.get<RespostaUsuarios>('/api/v1/usuarios', { params });
+    const { data } = await api.get<RespostaUsuarios>('/api/v1/usuarios', {
+      params,
+      headers: getAuthHeaders()
+    });
 
     usuarios.value = data.dados;
     total.value = data.paginacao?.total || 0;
@@ -457,7 +475,9 @@ async function salvarUsuarioRequest() {
         sistemasParaAdicionar: []
       };
 
-      await api.post('/api/v1/usuarios', payload);
+      await api.post('/api/v1/usuarios', payload, {
+        headers: getAuthHeaders()
+      });
       toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário cadastrado', life: 2500 });
     } else {
       const payload: Record<string, unknown> = {
@@ -471,7 +491,9 @@ async function salvarUsuarioRequest() {
         payload.senha = formulario.senha;
       }
 
-      await api.patch(`/api/v1/usuarios/${modal.idUsuario}`, payload);
+      await api.patch(`/api/v1/usuarios/${modal.idUsuario}`, payload, {
+        headers: getAuthHeaders()
+      });
       toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário atualizado', life: 2500 });
     }
 
@@ -497,7 +519,9 @@ function confirmarRemocao(usuario: UsuarioTabela) {
     rejectProps: { label: 'Cancelar', severity: 'secondary' },
     accept: async () => {
       try {
-        await api.delete(`/api/v1/usuarios/${usuario.id}`);
+        await api.delete(`/api/v1/usuarios/${usuario.id}`, {
+          headers: getAuthHeaders()
+        });
         toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário removido', life: 2500 });
         await carregarUsuarios();
       } catch {
