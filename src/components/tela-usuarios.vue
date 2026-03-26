@@ -165,6 +165,10 @@
   </Dialog>
 
   <ConfirmDialog />
+
+  <Toast />
+
+  <ConfirmDialog />
 </template>
 
 <script setup lang="ts">
@@ -173,6 +177,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { useApiService } from '@/services/api';
+import { Button, Column, DataTable, Dialog, FloatLabel, InputText, Password, Select, Toast } from 'primevue';
 
 type CargoUsuario = 'ADMIN' | 'NORMAL' | 'GERENTE';
 type CampoFiltro = 'todos' | 'nome' | 'email';
