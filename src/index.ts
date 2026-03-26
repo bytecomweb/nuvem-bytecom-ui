@@ -2,6 +2,7 @@ import Aura from '@primeuix/themes/aura'
 import PrimeVue from 'primevue/config'
 import type { App, Plugin } from 'vue'
 import UiButton from './components/UiButton.vue'
+import TelaUsuarios from './components/tela-usuarios.vue'
 import {
   API_SERVICE_KEY,
   configureApiService,
@@ -15,9 +16,10 @@ import {
 
 const components = {
   UiButton,
+  TelaUsuarios,
 }
 
-export { UiButton }
+export { UiButton, TelaUsuarios }
 export { API_SERVICE_KEY, configureApiService, createApiService, getApiService, useApiService }
 export type { ApiService, ApiServiceConfig, NuvemBytecomUiApiConfig }
 
