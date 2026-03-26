@@ -349,6 +349,9 @@ const temFiltroAtivo = computed(() => {
 
 async function carregarEmpresas() {
   estaCarregandoEmpresas.value = true;
+  
+  console.log(getAuthHeaders())
+
   try {
     const { data } = await api.get<RespostaEmpresas>('/api/v1/usuarios/empresas', {
       params: { busca: buscaEmpresa.value || undefined },
