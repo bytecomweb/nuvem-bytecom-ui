@@ -236,10 +236,39 @@ type RespostaEmpresas = {
   }>;
 };
 
+type ToastLike = {
+  add: (message: Record<string, unknown>) => void;
+};
+
+type ConfirmLike = {
+  require: (options: Record<string, unknown>) => void;
+};
+
 const api = useApiService().instance;
 
-const toast = useToast();
-const confirmacao = useConfirm();
+const noopToast: ToastLike = {
+  add: () => {}
+};
+
+const noopConfirm: ConfirmLike = {
+  require: () => {}
+};
+
+let toast: ToastLike = noopToast;
+let confirmacao: ConfirmLike = noopConfirm;
+
+try {
+  toast = useToast() as ToastLike;
+} catch {
+  toast = noopToast;
+}
+
+try {
+  confirmacao = useConfirm() as ConfirmLike;
+} catch {
+  confirmacao = noopConfirm;
+}
+
 const queryClient = useQueryClient();
 
 const buscaEmpresa = ref('');

@@ -1,5 +1,7 @@
 import Aura from '@primeuix/themes/aura'
 import PrimeVue from 'primevue/config'
+import ConfirmationService from 'primevue/confirmationservice'
+import ToastService from 'primevue/toastservice'
 import type { App, Plugin } from 'vue'
 import UiButton from './components/UiButton.vue'
 import TelaUsuarios from './components/tela-usuarios.vue'
@@ -42,6 +44,9 @@ export default {
         },
         ...(options.primevue ?? {}),
       })
+
+      app.use(ConfirmationService)
+      app.use(ToastService)
     }
 
     app.provide(API_SERVICE_KEY, apiService)
