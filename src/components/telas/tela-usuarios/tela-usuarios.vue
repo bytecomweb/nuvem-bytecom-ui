@@ -4,151 +4,31 @@
     @criar="abrirModalCriar"
   />
   <main class="px-4 mt-5 pb-10">
-    <div class="flex items-center gap-3">
-      <div class="w-[320px] relative">
-        <InputText
-          v-model="filtro.busca"
-          fluid
-          type="text"
-          placeholder="Buscar..."
-          @keydown="(e) => e.key === 'Enter' && sincronizarUsuarios()"
-        />
-        <span
-          v-if="temFiltroAtivo"
-          class="pi pi-times absolute right-3 top-3 cursor-pointer"
-          @click="limparFiltros"
-        />
-      </div>
-
-      <Select
-        v-model="filtro.campo"
-        :options="opcoesCampo"
-        option-label="label"
-        option-value="value"
-        placeholder="Buscar por"
-        class="w-[180px]"
-      />
-
-      <Select
-        v-model="filtro.cargo"
-        :options="opcoesCargo"
-        option-label="label"
-        option-value="value"
-        placeholder="Cargo"
-        class="w-[180px]"
-      />
-
-      <Button icon="pi pi-search" rounded @click="sincronizarUsuarios()" />
-    </div>
-
-    <DataTable
-      class="mt-5"
-      :value="usuarios"
-      lazy
-      paginator
-      :total-records="total"
-      :rows="paginacao.tamanhoPagina"
-      :rows-per-page-options="[5, 20, 50, 100]"
-      :loading="estaCarregandoUsuarios"
-      row-hover
-      @update:rows="
-        (novo) => {
-          paginacao.tamanhoPagina = novo;
-          paginacao.paginaAtual = 1;
-          sincronizarUsuarios();
-        }
-      "
-      @page="
-        (evt) => {
-          paginacao.paginaAtual = evt.page + 1;
-          sincronizarUsuarios();
-        }
-      "
-      @row-click="(evt) => abrirModalEditar(evt.data)"
-    >
-      <Column field="nome" header="Nome" />
-      <Column field="email" header="E-mail" />
-      <Column field="cnpjCpf" header="CNPJ/CPF" />
-      <Column field="cargo" header="Cargo" />
-      <Column header="Ações" style="width: 140px">
-        <template #body="{ data }">
-          <div class="flex gap-2">
-            <Button icon="pi pi-pencil" text rounded @click.stop="abrirModalEditar(data)" />
-            <Button
-              icon="pi pi-trash"
-              text
-              rounded
-              severity="danger"
-              @click.stop="confirmarRemocao(data)"
-            />
-          </div>
-        </template>
-      </Column>
-
-      <template #empty>
-        <p>Nenhum usuário encontrado</p>
-      </template>
-    </DataTable>
+    <TelaUsuariosFiltros
+      v-model:busca="filtro.busca"
+      v-model:campo="filtro.campo"
+      v-model:cargo="filtro.cargo"
+      :empresa-selecionada="empresaSelecionada"
+    />
+    <TelaUsuariosTabela
+      :usuarios="usuarios"
+      :total="total"
+      :paginacao="paginacao"
+      :carregando="estaCarregandoUsuarios"
+      @atualizar="carregarUsuarios"
+      @editar="abrirModalEditar"
+      @remover="confirmarRemocao"
+    />
   </main>
 
-  <Dialog
-    v-model:visible="modal.visivel"
-    :header="modal.modo === 'criar' ? 'Cadastrar usuário' : 'Editar usuário'"
-    class="w-[620px]"
-    modal
-  >
-    <form class="flex flex-col gap-4 mt-2" @submit.prevent>
-      <FloatLabel variant="on">
-        <InputText id="nome" v-model="formulario.nome" fluid />
-        <label for="nome">Nome</label>
-      </FloatLabel>
-
-      <FloatLabel variant="on">
-        <InputText id="email" v-model="formulario.email" fluid type="email" />
-        <label for="email">E-mail</label>
-      </FloatLabel>
-
-      <FloatLabel variant="on">
-        <InputText id="cnpjCpf" v-model="formulario.cnpjCpf" fluid />
-        <label for="cnpjCpf">CNPJ/CPF</label>
-      </FloatLabel>
-
-      <FloatLabel variant="on">
-        <Select
-          id="cargo"
-          v-model="formulario.cargo"
-          :options="opcoesCargoForm"
-          option-label="label"
-          option-value="value"
-          fluid
-        />
-        <label for="cargo">Cargo</label>
-      </FloatLabel>
-
-      <FloatLabel variant="on">
-        <Password
-          id="senha"
-          v-model="formulario.senha"
-          :feedback="false"
-          toggle-mask
-          fluid
-          autocomplete="new-password"
-        />
-        <label for="senha">{{ modal.modo === 'criar' ? 'Senha' : 'Nova senha (opcional)' }}</label>
-      </FloatLabel>
-    </form>
-
-    <template #footer>
-      <div class="w-full flex justify-end gap-2">
-        <Button label="Cancelar" severity="secondary" @click="modal.visivel = false" />
-        <Button
-          :label="modal.modo === 'criar' ? 'Cadastrar' : 'Salvar'"
-          :loading="estaSalvandoUsuario"
-          @click="salvarUsuario"
-        />
-      </div>
-    </template>
-  </Dialog>
+  <TelaUsuariosFormulario
+    v-model:visivel="modal.visivel"
+    v-model:formulario="formulario"
+    :modo="modal.modo"
+    :usuario-id="modal.idUsuario"
+    :carregando="estaSalvandoUsuario"
+    @salvar="salvarUsuario"
+  />
 
   <ConfirmDialog />
 
@@ -162,54 +42,22 @@
   import { useToast } from 'primevue/usetoast';
   import { useApiService } from '@/services/api';
   import TelaUsuariosCabecalho from '@/components/telas/tela-usuarios/components/tela-usuarios-cabecalho.vue';
+  import TelaUsuariosFiltros from '@/components/telas/tela-usuarios/components/tela-usuarios-filtros.vue';
+  import TelaUsuariosTabela from '@/components/telas/tela-usuarios/components/tela-usuarios-tabela.vue';
+  import TelaUsuariosFormulario from '@/components/telas/tela-usuarios/components/tela-usuarios-formulario.vue';
+  import { CargoUsuario, Usuario } from '@/types/modelos/usuario';
+  import { ConfirmDialog, Toast } from 'primevue';
+  import { Empresa } from '@/types/modelos/empresa';
+  import { TelaUsuariosCampoFiltro } from '@/components/telas/tela-usuarios/types/tela-usuarios-campo-filtro';
 
   const props = defineProps<{
     bearerToken?: string;
   }>();
 
-  type CargoUsuario = 'ADMIN' | 'NORMAL' | 'GERENTE';
-  type CampoFiltro = 'todos' | 'nome' | 'email';
-
-  type EmpresaOpcao = {
-    id: number;
-    nomeRazao: string;
-    nomeFantasia: string;
-    cnpj: string;
-    status: string;
-    nomeVirtual: string;
-  };
-
-  type UsuarioTabela = {
-    id: number;
-    nome: string;
-    email: string;
-    cnpjCpf: string;
-    cargo: CargoUsuario;
-    empresas: Array<{
-      empresa: {
-        id: number;
-        nomeRazao: string;
-        nomeFantasia: string;
-        cnpj: string;
-      };
-      cargo: 'GERENTE' | 'NORMAL';
-    }>;
-    sistemas: Array<{
-      idEmpresa: number;
-      sistema: {
-        id: number;
-        nome: string;
-        imagem: string | null;
-        linkBackend: string | null;
-        linkFrontend: string | null;
-      };
-    }>;
-  };
-
   type RespostaUsuarios = {
     erro: boolean;
     mensagem: string;
-    dados: UsuarioTabela[];
+    dados: Usuario[];
     paginacao: {
       paginaAtual: number;
       tamanhoPagina: number;
@@ -283,11 +131,11 @@
   }
 
   const buscaEmpresa = ref('');
-  const empresaSelecionada = ref<EmpresaOpcao | undefined>(undefined);
+  const empresaSelecionada = ref<Empresa | undefined>(undefined);
 
   const filtro = reactive({
     busca: '',
-    campo: 'todos' as CampoFiltro,
+    campo: 'todos' as TelaUsuariosCampoFiltro,
     cargo: 'todos' as 'todos' | CargoUsuario,
   });
 
@@ -306,44 +154,17 @@
     nome: '',
     email: '',
     cnpjCpf: '',
-    cargo: 'NORMAL' as 'ADMIN' | 'NORMAL',
+    cargo: 'NORMAL' as CargoUsuario,
     senha: '',
   });
 
-  const opcoesCampo = [
-    { label: 'Todos', value: 'todos' },
-    { label: 'Nome', value: 'nome' },
-    { label: 'E-mail', value: 'email' },
-  ];
-
-  const opcoesCargo = [
-    { label: 'Todos', value: 'todos' },
-    { label: 'Admin', value: 'ADMIN' },
-    { label: 'Normal', value: 'NORMAL' },
-    { label: 'Gerente', value: 'GERENTE' },
-  ];
-
-  const opcoesCargoForm = [
-    { label: 'Admin', value: 'ADMIN' },
-    { label: 'Normal', value: 'NORMAL' },
-  ];
-
-  const opcoesEmpresas = ref<EmpresaOpcao[]>([]);
+  const opcoesEmpresas = ref<Empresa[]>([]);
   const estaCarregandoEmpresas = ref(false);
 
-  const usuarios = ref<UsuarioTabela[]>([]);
+  const usuarios = ref<Usuario[]>([]);
   const total = ref(0);
   const estaCarregandoUsuarios = ref(false);
   const estaSalvandoUsuario = ref(false);
-
-  const temFiltroAtivo = computed(() => {
-    return (
-      !!filtro.busca ||
-      filtro.campo !== 'todos' ||
-      filtro.cargo !== 'todos' ||
-      !!empresaSelecionada.value
-    );
-  });
 
   async function carregarEmpresas() {
     estaCarregandoEmpresas.value = true;
@@ -421,7 +242,7 @@
     modal.visivel = true;
   }
 
-  function abrirModalEditar(usuario: UsuarioTabela) {
+  function abrirModalEditar(usuario: Usuario) {
     modal.modo = 'editar';
     modal.idUsuario = usuario.id;
     formulario.nome = usuario.nome;
@@ -530,7 +351,7 @@
     }
   }
 
-  function confirmarRemocao(usuario: UsuarioTabela) {
+  function confirmarRemocao(usuario: Usuario) {
     confirmacao.require({
       header: 'Remover usuário?',
       message: `Você tem certeza que deseja remover o usuário ${usuario.nome}?`,
