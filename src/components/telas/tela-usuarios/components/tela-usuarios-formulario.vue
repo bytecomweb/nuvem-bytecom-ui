@@ -59,7 +59,7 @@
   </Dialog>
 </template>
 <script lang="ts" setup>
-  import { CargoUsuario } from '@/types/modelos/usuario';
+  import { UsuarioCargo } from '@/types/modelos/usuario';
   import { Button, Dialog, FloatLabel, InputText, Password, Select } from 'primevue';
 
   const visivel = defineModel<boolean>('visivel', {
@@ -79,7 +79,7 @@
     nome: string;
     email: string;
     cnpjCpf: string;
-    cargo: CargoUsuario;
+    cargo: UsuarioCargo;
     senha?: string;
   }>('formulario', {
     required: true,

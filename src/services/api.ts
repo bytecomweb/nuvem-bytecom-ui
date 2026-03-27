@@ -5,12 +5,14 @@ export interface ApiServiceConfig {
   baseURL?: string;
   prefix?: string;
   axios?: AxiosRequestConfig;
+  bearerToken?: string;
 }
 
 export interface ApiService {
   instance: AxiosInstance;
   config: Required<Pick<ApiServiceConfig, 'baseURL' | 'prefix'>> & {
     axios?: AxiosRequestConfig;
+    bearerToken?: string;
   };
   setConfig: (config?: ApiServiceConfig) => AxiosInstance;
 }
@@ -61,11 +63,17 @@ export function createApiService(initialConfig: ApiServiceConfig = {}): ApiServi
       baseURL: nextConfig.baseURL ?? currentConfig.baseURL,
       prefix: nextConfig.prefix ?? currentConfig.prefix,
       axios: nextConfig.axios ?? currentConfig.axios,
+      bearerToken: nextConfig.bearerToken,
     };
 
     instance = axios.create({
       ...currentConfig.axios,
       baseURL: buildBaseURL(currentConfig.baseURL, currentConfig.prefix),
+      headers: {
+        Authorization: currentConfig.bearerToken
+          ? `Bearer ${currentConfig.bearerToken}`
+          : undefined,
+      },
     });
 
     service.instance = instance;

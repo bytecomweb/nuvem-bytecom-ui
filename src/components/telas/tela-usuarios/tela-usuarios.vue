@@ -45,10 +45,15 @@
   import TelaUsuariosFiltros from '@/components/telas/tela-usuarios/components/tela-usuarios-filtros.vue';
   import TelaUsuariosTabela from '@/components/telas/tela-usuarios/components/tela-usuarios-tabela.vue';
   import TelaUsuariosFormulario from '@/components/telas/tela-usuarios/components/tela-usuarios-formulario.vue';
-  import { CargoUsuario, Usuario } from '@/types/modelos/usuario';
+  import { UsuarioCargo, Usuario } from '@/types/modelos/usuario';
   import { ConfirmDialog, Toast } from 'primevue';
   import { Empresa } from '@/types/modelos/empresa';
   import { TelaUsuariosCampoFiltro } from '@/components/telas/tela-usuarios/types/tela-usuarios-campo-filtro';
+  import obterEmpresas from '@/data/empresa/obter-empresas';
+  import obterUsuarios from '@/data/usuario/obter-usuarios';
+  import cadastrarUsuario from '@/data/usuario/criar-usuario';
+  import atualizarUsuarioPorId from '@/data/usuario/atualizar-usuario-por-id';
+  import apagarUsuario from '@/data/usuario/apagar-usuario';
 
   const props = defineProps<{
     bearerToken?: string;
@@ -65,18 +70,6 @@
     };
   };
 
-  type RespostaEmpresas = {
-    erro: boolean;
-    mensagem: string;
-    dados: Array<{
-      id: number;
-      nomeRazao: string;
-      nomeFantasia: string;
-      cnpj: string;
-      status: string;
-    }>;
-  };
-
   type ToastLike = {
     add: (message: Record<string, unknown>) => void;
   };
@@ -87,25 +80,9 @@
 
   const api = useApiService().instance;
 
-  function getRequestConfig(config: AxiosRequestConfig = {}): AxiosRequestConfig {
-    const headers: RawAxiosRequestHeaders = {
-      ...(config.headers as RawAxiosRequestHeaders | undefined),
-    };
-
-    if (props.bearerToken) {
-      headers.Authorization = `Bearer ${props.bearerToken}`;
-    }
-
-    return {
-      ...config,
-      headers,
-    };
-  }
-
-  async function apiRequest<T>(config: AxiosRequestConfig): Promise<T> {
-    const response = await api.request<T>(getRequestConfig(config));
-    return response.data;
-  }
+  useApiService().setConfig({
+    bearerToken: props.bearerToken,
+  });
 
   const noopToast: ToastLike = {
     add: () => {},
@@ -136,7 +113,7 @@
   const filtro = reactive({
     busca: '',
     campo: 'todos' as TelaUsuariosCampoFiltro,
-    cargo: 'todos' as 'todos' | CargoUsuario,
+    cargo: 'todos' as 'todos' | UsuarioCargo,
   });
 
   const paginacao = reactive({
@@ -154,7 +131,7 @@
     nome: '',
     email: '',
     cnpjCpf: '',
-    cargo: 'NORMAL' as CargoUsuario,
+    cargo: 'NORMAL' as UsuarioCargo,
     senha: '',
   });
 
@@ -167,16 +144,12 @@
   const estaSalvandoUsuario = ref(false);
 
   async function carregarEmpresas() {
-    estaCarregandoEmpresas.value = true;
-
     try {
-      const data = await apiRequest<RespostaEmpresas>({
-        method: 'get',
-        url: '/usuarios/empresas',
-        params: { busca: buscaEmpresa.value || undefined },
-      });
+      estaCarregandoEmpresas.value = true;
 
-      opcoesEmpresas.value = data.dados.map((empresa) => ({
+      const { dados } = await obterEmpresas(buscaEmpresa.value);
+
+      opcoesEmpresas.value = dados.map((empresa) => ({
         ...empresa,
         nomeVirtual:
           empresa.nomeRazao.length > 30
@@ -197,27 +170,17 @@
 
     estaCarregandoUsuarios.value = true;
     try {
-      const params: Record<string, unknown> = {
-        pagina: paginacao.paginaAtual,
+      const { dados, paginacao: paginacaoRetornada } = await obterUsuarios({
+        empresaId: empresaSelecionada.value.id,
+        busca: filtro.busca,
+        campo: filtro.campo,
+        cargo: filtro.cargo,
+        paginaAtual: paginacao.paginaAtual,
         tamanhoPagina: paginacao.tamanhoPagina,
-        empresas: true,
-        sistemas: true,
-        idEmpresa: empresaSelecionada.value.id,
-        cargo: filtro.cargo === 'todos' ? undefined : filtro.cargo,
-      };
-
-      if (filtro.campo !== 'todos' && filtro.busca) {
-        params[filtro.campo] = filtro.busca;
-      }
-
-      const data = await apiRequest<RespostaUsuarios>({
-        method: 'get',
-        url: '/usuarios',
-        params,
       });
 
-      usuarios.value = data.dados;
-      total.value = data.paginacao?.total || 0;
+      usuarios.value = dados;
+      total.value = paginacaoRetornada?.total || 0;
     } finally {
       estaCarregandoUsuarios.value = false;
     }
@@ -288,23 +251,14 @@
     estaSalvandoUsuario.value = true;
     try {
       if (modal.modo === 'criar') {
-        const payload = {
-          nome: formulario.nome,
-          email: formulario.email.trim().toLowerCase(),
-          cnpjCpf: somenteNumeros(formulario.cnpjCpf),
-          cargo: formulario.cargo,
-          senha: formulario.senha,
-          empresasParaAdicionar: empresaSelecionada.value
+        await cadastrarUsuario({
+          ...formulario,
+          empresasSelecionadas: empresaSelecionada.value
             ? [{ id: empresaSelecionada.value.id, cargo: 'GERENTE' as const }]
             : [],
           sistemasParaAdicionar: [],
-        };
-
-        await apiRequest({
-          method: 'post',
-          url: '/usuarios',
-          data: payload,
         });
+
         toast.add({
           severity: 'success',
           summary: 'Sucesso',
@@ -323,11 +277,15 @@
           payload.senha = formulario.senha;
         }
 
-        await apiRequest({
-          method: 'patch',
-          url: `/usuarios/${modal.idUsuario}`,
-          data: payload,
+        await atualizarUsuarioPorId(modal.idUsuario, {
+          ...formulario,
+          empresas: empresaSelecionada.value
+            ? [{ id: empresaSelecionada.value.id, cargo: 'GERENTE' as const }]
+            : [],
+          sistemasParaAdicionar: [],
+          sistemasParaRemover: [],
         });
+
         toast.add({
           severity: 'success',
           summary: 'Sucesso',
@@ -359,10 +317,8 @@
       rejectProps: { label: 'Cancelar', severity: 'secondary' },
       accept: async () => {
         try {
-          await apiRequest({
-            method: 'delete',
-            url: `/usuarios/${usuario.id}`,
-          });
+          await apagarUsuario(usuario.id);
+
           toast.add({
             severity: 'success',
             summary: 'Sucesso',

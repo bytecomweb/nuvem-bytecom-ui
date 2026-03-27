@@ -33,7 +33,7 @@
 <script lang="ts" setup>
   import { TelaUsuariosCampoFiltro } from '@/components/telas/tela-usuarios/types/tela-usuarios-campo-filtro';
   import { Empresa } from '@/types/modelos/empresa';
-  import { CargoUsuario } from '@/types/modelos/usuario';
+  import { UsuarioCargo } from '@/types/modelos/usuario';
   import { Button, InputText, Select } from 'primevue';
   import { computed } from 'vue';
 
@@ -50,7 +50,7 @@
     default: 'todos',
   });
 
-  const cargo = defineModel<CargoUsuario | 'todos'>('cargo', {
+  const cargo = defineModel<UsuarioCargo | 'todos'>('cargo', {
     required: true,
     default: 'todos',
   });

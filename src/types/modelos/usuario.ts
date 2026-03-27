@@ -1,11 +1,12 @@
-export type CargoUsuario = 'ADMIN' | 'NORMAL' | 'GERENTE';
+export type UsuarioCargo = 'ADMIN' | 'NORMAL' | 'GERENTE';
 
 export type Usuario = {
   id: number;
   nome: string;
   email: string;
   cnpjCpf: string;
-  cargo: CargoUsuario;
+  senha: string;
+  cargo: UsuarioCargo;
   empresas: Array<{
     empresa: {
       id: number;

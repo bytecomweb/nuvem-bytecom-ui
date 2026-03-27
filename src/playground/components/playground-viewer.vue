@@ -34,10 +34,14 @@
     const telaId = telaAtual.value?.id;
 
     if (telaId === 'tela-usuarios') {
-      return { bearerToken: 'mock-token-12345' };
+      return { bearerToken: token.value };
     }
 
     return {};
+  });
+
+  const token = computed(() => {
+    return localStorage.getItem('token') || undefined;
   });
 </script>
 
