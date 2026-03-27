@@ -1,7 +1,7 @@
 import { TelaUsuariosCampoFiltro } from '@/components/telas/tela-usuarios/types/tela-usuarios-campo-filtro';
-import { useApiService } from '@/services/api';
 import { Usuario, UsuarioCargo } from '@/types/modelos/usuario';
 import { RespostaPaginada } from '@/types/respostas/resposta-paginada';
+import { AxiosInstance } from 'axios';
 
 type ObterUsuariosParametros = {
   tamanhoPagina?: number;
@@ -12,15 +12,11 @@ type ObterUsuariosParametros = {
   empresaId: number;
 };
 
-export default async function obterUsuarios({
-  empresaId,
-  busca,
-  campo,
-  cargo,
-  paginaAtual,
-  tamanhoPagina,
-}: ObterUsuariosParametros) {
-  const { data } = await useApiService().instance.get<RespostaPaginada<Usuario>>('/usuarios', {
+export default async function obterUsuarios(
+  api: AxiosInstance,
+  { empresaId, busca, campo, cargo, paginaAtual, tamanhoPagina }: ObterUsuariosParametros
+) {
+  const { data } = await api.get<RespostaPaginada<Usuario>>('/usuarios', {
     params: {
       pagina: paginaAtual,
       tamanhoPagina,

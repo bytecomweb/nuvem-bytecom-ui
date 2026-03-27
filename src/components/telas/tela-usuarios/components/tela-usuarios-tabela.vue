@@ -27,7 +27,14 @@
     <Column field="nome" header="Nome" />
     <Column field="email" header="E-mail" />
     <Column field="cnpjCpf" header="CNPJ/CPF" />
-    <Column field="cargo" header="Cargo" />
+    <Column field="cargo" header="Cargo" v-if="ehAdmin">
+      <template #body="{ data }">
+        <Tag
+          :value="LEGENDA_CARGOS[data.cargo as keyof typeof LEGENDA_CARGOS]"
+          severity="secondary"
+        />
+      </template>
+    </Column>
     <Column header="Ações" style="width: 140px">
       <template #body="{ data }">
         <div class="flex gap-2">
@@ -49,7 +56,7 @@
   </DataTable>
 </template>
 <script lang="ts" setup>
-  import { DataTable, Column, Button } from 'primevue';
+  import { DataTable, Column, Button, Tag } from 'primevue';
   import { type Usuario } from '@/types/modelos/usuario';
 
   const usuarios = defineModel<Usuario[]>('usuarios', {
@@ -81,5 +88,11 @@
 
   defineProps<{
     carregando?: boolean;
+    ehAdmin?: boolean;
   }>();
+
+  const LEGENDA_CARGOS = {
+    ADMIN: 'Admin',
+    NORMAL: 'Funcionário',
+  };
 </script>

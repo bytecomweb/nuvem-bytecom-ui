@@ -1,11 +1,9 @@
-import { useApiService } from '@/services/api';
 import { Usuario } from '@/types/modelos/usuario';
 import { RespostaSucesso } from '@/types/respostas/resposta-sucesso';
+import { AxiosInstance } from 'axios';
 
-type AtualizarUsuarioPorIdParametros = Pick<
-  Usuario,
-  'nome' | 'cargo' | 'senha' | 'cnpjCpf' | 'email'
-> & {
+type AtualizarUsuarioPorIdParametros = Pick<Usuario, 'nome' | 'cargo' | 'cnpjCpf' | 'email'> & {
+  senha?: string;
   empresas: {
     id: number;
     cargo: 'GERENTE' | 'NORMAL';
@@ -23,13 +21,11 @@ type AtualizarUsuarioPorIdParametros = Pick<
 };
 
 export default async function atualizarUsuarioPorId(
+  api: AxiosInstance,
   id: number,
   params: AtualizarUsuarioPorIdParametros
 ) {
-  const { data } = await useApiService().instance.put<RespostaSucesso<Usuario>>(
-    `/usuarios/${id}`,
-    params
-  );
+  const { data } = await api.patch<RespostaSucesso<Usuario>>(`/usuarios/${id}`, params);
 
   return data;
 }

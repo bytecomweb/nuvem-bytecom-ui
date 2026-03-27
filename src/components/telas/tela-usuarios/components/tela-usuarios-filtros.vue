@@ -25,6 +25,7 @@
       option-value="value"
       placeholder="Cargo"
       class="w-45"
+      v-if="ehAdmin"
     />
 
     <Button icon="pi pi-search" rounded @click="emit('buscar')" />
@@ -39,6 +40,7 @@
 
   const { empresaSelecionada } = defineProps<{
     empresaSelecionada?: Empresa;
+    ehAdmin?: boolean;
   }>();
 
   const busca = defineModel<string>('busca', {
@@ -73,6 +75,5 @@
     { label: 'Todos', value: 'todos' },
     { label: 'Admin', value: 'ADMIN' },
     { label: 'Normal', value: 'NORMAL' },
-    { label: 'Gerente', value: 'GERENTE' },
   ];
 </script>
