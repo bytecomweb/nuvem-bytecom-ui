@@ -27,7 +27,11 @@
   >
     <Column field="nome" header="Nome" />
     <Column field="email" header="E-mail" />
-    <Column field="cnpjCpf" header="CNPJ/CPF" />
+    <Column field="cnpjCpf" header="CNPJ/CPF">
+      <template #body="{ data }">
+        {{ data.cnpjCpf.length === 11 ? formatCPF(data.cnpjCpf) : formatCNPJ(data.cnpjCpf) }}
+      </template>
+    </Column>
     <Column field="cargo" header="Cargo" v-if="ehAdmin">
       <template #body="{ data }">
         <Tag
@@ -59,6 +63,7 @@
 <script lang="ts" setup>
   import { DataTable, Column, Button, Tag } from 'primevue';
   import { type Usuario } from '@/types/modelos/usuario';
+  import { formatCNPJ, formatCPF } from '@brazilian-utils/brazilian-utils';
 
   const usuarios = defineModel<Usuario[]>('usuarios', {
     required: true,
