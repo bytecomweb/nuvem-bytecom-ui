@@ -22,9 +22,10 @@
       :gerenciamento-restrito="instancia.podeGerenciar === false"
       :key="idx"
       @apagar="() => confirmarApagarInstancia(instancia.name)"
+      @configurar="instanciaParaConfigurar = instancia"
     />
     <!-- 
-      @configurar="instanciaParaConfigurar = instancia"
+      
       @conectar="instanciaParaConectar = instancia"
       @desconectar="confirmarDesconexao(instancia.name)" -->
   </main>
@@ -34,6 +35,11 @@
     :empresa-id="empresaSelecionada?.id"
     @atualizar-instancias="tentaObterInstancias"
   />
+  <TelaWhatsappConfiguracaoFormulario
+    v-model:instancia="instanciaParaConfigurar"
+    v-if="empresaSelecionada"
+    :empresa-id="empresaSelecionada.id"
+  />
   <ConfirmDialog />
   <Toast />
 </template>
@@ -41,6 +47,7 @@
   import TelaWhatsappCabecalho from '@/components/telas/tela-whatsapp/components/tela-whatsapp-cabecalho.vue';
   import TelaWhatsappCardInstanciaPadrao from '@/components/telas/tela-whatsapp/components/tela-whatsapp-card-instancia-padrao.vue';
   import TelaWhatsappCardInstancia from '@/components/telas/tela-whatsapp/components/tela-whatsapp-card-instancia.vue';
+  import TelaWhatsappConfiguracaoFormulario from '@/components/telas/tela-whatsapp/components/tela-whatsapp-configuracao-formulario.vue';
   import TelaWhatsappFormulario from '@/components/telas/tela-whatsapp/components/tela-whatsapp-formulario.vue';
   import useApi from '@/composables/use-api';
   import useNotification from '@/composables/use-notification';
@@ -169,4 +176,6 @@
   });
 
   const formularioVisivel = ref(false);
+
+  const instanciaParaConfigurar = ref<WhatsAppInstancia>();
 </script>
