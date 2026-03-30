@@ -21,8 +21,9 @@
       :instancia
       :gerenciamento-restrito="instancia.podeGerenciar === false"
       :key="idx"
+      @apagar="() => confirmarApagarInstancia(instancia.name)"
     />
-    <!-- @apagar="() => confirmarApagarInstancia(instancia.name)"
+    <!-- 
       @configurar="instanciaParaConfigurar = instancia"
       @conectar="instanciaParaConectar = instancia"
       @desconectar="confirmarDesconexao(instancia.name)" -->
@@ -33,6 +34,8 @@
     :empresa-id="empresaSelecionada?.id"
     @atualizar-instancias="tentaObterInstancias"
   />
+  <ConfirmDialog />
+  <Toast />
 </template>
 <script lang="ts" setup>
   import TelaWhatsappCabecalho from '@/components/telas/tela-whatsapp/components/tela-whatsapp-cabecalho.vue';
@@ -41,6 +44,7 @@
   import TelaWhatsappFormulario from '@/components/telas/tela-whatsapp/components/tela-whatsapp-formulario.vue';
   import useApi from '@/composables/use-api';
   import useNotification from '@/composables/use-notification';
+  import apagarWhatsAppInstancia from '@/data/whatsapp/apagar-whatsapp-instancia';
   import obterWhatsAppInstanciaPadrao, {
     DadosInstanciaPadrao,
   } from '@/data/whatsapp/obter-whatsapp-instancia-padrao';
@@ -48,6 +52,10 @@
   import { Empresa } from '@/types/modelos/empresa';
   import { WhatsAppInstancia } from '@/types/modelos/whatsapp-instancia';
   import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
+  import apenasNumeros from '@/utils/texto/apenas-numeros';
+  import formatarTexto from '@/utils/texto/formatar-texto';
+  import removerSimbolos from '@/utils/texto/remover-simbolos';
+  import { ConfirmDialog, Toast, useConfirm } from 'primevue';
   import { computed, onMounted, ref, watch } from 'vue';
 
   const { bearerToken, ehAdmin } = defineProps<{
@@ -106,6 +114,46 @@
         obterErroDaRequisicao(err) ||
           'Não foi possível obter a instância padrão de WhatsApp. Tente novamente mais tarde.'
       );
+    }
+  };
+
+  const confirm = useConfirm();
+
+  const confirmarApagarInstancia = (numero: string) => {
+    console.log(numero);
+    const numeroFormatado = formatarTexto({
+      texto: removerSimbolos(numero),
+      mascara: ['(00) 0000-0000', '(00) 0 0000-0000', '+00 (00) 0000-0000', '+00 (00) 0 0000-0000'],
+    });
+
+    confirm.require({
+      header: 'Apagar instância?',
+      message: `Deseja realmente apagar a instância com o número ${numeroFormatado}?`,
+      acceptLabel: 'Apagar',
+      acceptProps: {
+        severity: 'danger',
+      },
+      rejectLabel: 'Cancelar',
+      rejectProps: {
+        severity: 'secondary',
+      },
+      accept() {
+        tentaApagarInstancia(numero);
+      },
+    });
+  };
+
+  const tentaApagarInstancia = async (numero: string) => {
+    try {
+      if (empresaSelecionada.value) {
+        await apagarWhatsAppInstancia(api, empresaSelecionada.value.id, apenasNumeros(numero));
+      }
+
+      setTimeout(() => {
+        tentaObterInstancias();
+      }, 150);
+    } catch (err) {
+      erro(obterErroDaRequisicao(err) || 'Não foi possível apagar instância');
     }
   };
 
