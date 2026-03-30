@@ -80,30 +80,23 @@
 </template>
 <script lang="ts" setup>
   import { UsuarioSistema } from '@/components/telas/tela-usuarios/schemas/usuario-sistema-schema';
+  import useApi from '@/composables/use-api';
   import useNotification from '@/composables/use-notification';
   import obterSistemasDaEmpresa from '@/data/empresa/obter-sistemas-da-empresa';
   import { Sistema } from '@/types/modelos/sistema';
   import { Usuario } from '@/types/modelos/usuario';
   import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
   import { AxiosInstance } from 'axios';
-  import {
-    AutoComplete,
-    Avatar,
-    Button,
-    ButtonStyle,
-    Column,
-    DataTable,
-    Dialog,
-    FloatLabel,
-  } from 'primevue';
+  import { AutoComplete, Avatar, Button, Column, DataTable, Dialog, FloatLabel } from 'primevue';
   import { FieldEntry, useField, useFieldArray } from 'vee-validate';
   import { ref, watch } from 'vue';
 
-  const { empresaId, usuario, api } = defineProps<{
+  const { empresaId, usuario } = defineProps<{
     empresaId?: number;
     usuario?: Usuario;
-    api: AxiosInstance;
   }>();
+
+  const api = useApi();
 
   const visivel = defineModel<boolean>('visivel', {
     required: true,

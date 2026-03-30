@@ -21,6 +21,7 @@
   </Select>
 </template>
 <script lang="ts" setup>
+  import useApi from '@/composables/use-api';
   import useNotification from '@/composables/use-notification';
   import obterEmpresasDoUsuario from '@/data/usuario/obter-empresas-do-usuario';
   import { Empresa } from '@/types/modelos/empresa';
@@ -31,11 +32,12 @@
 
   const modelValue = defineModel<Empresa>();
 
-  const { selecionarPrimeiroAutomaticamente, api } = defineProps<{
+  const { selecionarPrimeiroAutomaticamente } = defineProps<{
     selecionarPrimeiroAutomaticamente?: boolean;
     filtro?: boolean;
-    api: AxiosInstance;
   }>();
+
+  const api = useApi();
 
   const select = useTemplateRef('select');
 
