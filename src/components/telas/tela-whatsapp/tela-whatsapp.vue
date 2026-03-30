@@ -24,10 +24,8 @@
       @apagar="() => confirmarApagarInstancia(instancia.name)"
       @configurar="instanciaParaConfigurar = instancia"
       @conectar="instanciaParaConectar = instancia"
+      @desconectar="confirmarDesconexao(instancia.name)"
     />
-    <!-- 
-      
-      @desconectar="confirmarDesconexao(instancia.name)" -->
   </main>
   <TelaWhatsappFormulario
     v-model:visivel="formularioVisivel"
@@ -59,6 +57,7 @@
   import useApi from '@/composables/use-api';
   import useNotification from '@/composables/use-notification';
   import apagarWhatsAppInstancia from '@/data/whatsapp/apagar-whatsapp-instancia';
+  import desconectarWhatsAppInstancia from '@/data/whatsapp/desconectar-whatsapp-instancia';
   import obterWhatsAppInstanciaPadrao, {
     DadosInstanciaPadrao,
   } from '@/data/whatsapp/obter-whatsapp-instancia-padrao';
@@ -91,7 +90,7 @@
     return instancias.value.filter((instancia) => !instancia.ehInstanciaPadrao);
   });
 
-  const { erro } = useNotification();
+  const { erro, sucesso } = useNotification();
 
   const carregando = ref(false);
 
@@ -134,7 +133,6 @@
   const confirm = useConfirm();
 
   const confirmarApagarInstancia = (numero: string) => {
-    console.log(numero);
     const numeroFormatado = formatarTexto({
       texto: removerSimbolos(numero),
       mascara: ['(00) 0000-0000', '(00) 0 0000-0000', '+00 (00) 0000-0000', '+00 (00) 0 0000-0000'],
@@ -186,4 +184,45 @@
 
   const instanciaParaConfigurar = ref<WhatsAppInstancia>();
   const instanciaParaConectar = ref<WhatsAppInstancia>();
+
+  const confirmarDesconexao = (numero: string) => {
+    if (!empresaSelecionada.value) return;
+
+    const numeroFormatado = formatarTexto({
+      texto: removerSimbolos(numero),
+      mascara: ['(00) 0000-0000', '(00) 0 0000-0000', '+00 (00) 0000-0000', '+00 (00) 0 0000-0000'],
+    });
+
+    confirm.require({
+      header: 'Desconectar instância?',
+      message: `Deseja realmente desconectar a instância com o número ${numeroFormatado}?`,
+      acceptLabel: 'Desconectar',
+      acceptProps: {
+        severity: 'danger',
+      },
+      rejectLabel: 'Cancelar',
+      rejectProps: {
+        severity: 'secondary',
+      },
+      accept() {
+        tentaDesconectarInstancia(numero);
+      },
+    });
+  };
+
+  const tentaDesconectarInstancia = async (numero: string) => {
+    try {
+      if (!empresaSelecionada.value) {
+        return;
+      }
+
+      await desconectarWhatsAppInstancia(api, empresaSelecionada.value.id, numero);
+
+      sucesso('Instância desconectada com sucesso');
+
+      setTimeout(tentaObterInstancias, 150);
+    } catch (err) {
+      erro(obterErroDaRequisicao(err) || 'Não foi possível desconectar');
+    }
+  };
 </script>
