@@ -26,7 +26,6 @@
   import obterEmpresasDoUsuario from '@/data/usuario/obter-empresas-do-usuario';
   import { Empresa } from '@/types/modelos/empresa';
   import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
-  import { AxiosInstance } from 'axios';
   import { Select } from 'primevue';
   import { onMounted, ref, useTemplateRef, watch } from 'vue';
 

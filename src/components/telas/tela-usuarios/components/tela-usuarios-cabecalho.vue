@@ -12,7 +12,7 @@
   </header>
 </template>
 <script lang="ts" setup>
-  import SelectEmpresa from '@/components/telas/selects/select-empresa.vue';
+  import SelectEmpresa from '@/components/selects/select-empresa.vue';
   import { Empresa } from '@/types/modelos/empresa';
   import { Button } from 'primevue';
 

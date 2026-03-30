@@ -1,6 +1,6 @@
 <template>
   <Cabecalho titulo="WhatsApp">
-    <Button label="Criar instância" icon="pi pi-plus" @click="emit('cadastrar')" />
+    <Button label="Criar instância" icon="pi pi-plus" @click="emit('criar')" />
     <SelectEmpresa
       class="w-[320px]!"
       selecionar-primeiro-automaticamente
@@ -11,7 +11,7 @@
 </template>
 <script lang="ts" setup>
   import Cabecalho from '@/components/cabecalho.vue';
-  import SelectEmpresa from '@/components/telas/selects/select-empresa.vue';
+  import SelectEmpresa from '@/components/selects/select-empresa.vue';
   import { Empresa } from '@/types/modelos/empresa';
   import { Button } from 'primevue';
 
@@ -19,5 +19,5 @@
     required: true,
   });
 
-  const emit = defineEmits(['cadastrar']);
+  const emit = defineEmits(['criar']);
 </script>

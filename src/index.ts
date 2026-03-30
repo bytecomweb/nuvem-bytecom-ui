@@ -2,6 +2,7 @@ import Aura from '@primeuix/themes/aura';
 import PrimeVue from 'primevue/config';
 import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
+import Tooltip from 'primevue/tooltip';
 import type { App, Plugin } from 'vue';
 import TelaUsuarios from '@/components/telas/tela-usuarios/tela-usuarios.vue';
 import {
@@ -48,6 +49,7 @@ export default {
 
       app.use(ConfirmationService);
       app.use(ToastService);
+      app.directive('tooltip', Tooltip);
     }
 
     app.provide(API_SERVICE_KEY, apiService);

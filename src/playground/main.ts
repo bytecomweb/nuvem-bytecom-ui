@@ -5,10 +5,12 @@ import App from './App.vue';
 import 'primeicons/primeicons.css';
 import '../style.css';
 
-createApp(App)
-  .use(NuvemBytecomUi, {
-    api: {
-      baseURL: 'http://localhost:3000/api/v1',
-    },
-  })
-  .mount('#app');
+const app = createApp(App);
+
+app.use(NuvemBytecomUi, {
+  api: {
+    baseURL: 'http://localhost:3000/api/v1',
+  },
+});
+
+app.mount('#app');

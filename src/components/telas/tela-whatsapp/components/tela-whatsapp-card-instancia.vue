@@ -3,16 +3,17 @@
     <div class="flex flex-col justify-between gap-6">
       <p>
         {{
-          instancia.titulo ||
-          formatarTexto({
-            texto: removerSimbolos(instancia.name),
-            mascara: [
-              '(00) 0000-0000',
-              '(00) 0 0000-0000',
-              '+00 (00) 0000-0000',
-              '+00 (00) 0 0000-0000',
-            ],
-          })
+          instancia.ehInstanciaPadrao
+            ? instancia.titulo
+            : formatarTexto({
+                texto: removerSimbolos(instancia.name),
+                mascara: [
+                  '(00) 0000-0000',
+                  '(00) 0 0000-0000',
+                  '+00 (00) 0000-0000',
+                  '+00 (00) 0 0000-0000',
+                ],
+              })
         }}
       </p>
       <Tag

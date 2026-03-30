@@ -1,5 +1,8 @@
 <template>
-  <TelaWhatsappCabecalho v-model:empresa-selecionada="empresaSelecionada" />
+  <TelaWhatsappCabecalho
+    v-model:empresa-selecionada="empresaSelecionada"
+    @criar="formularioVisivel = true"
+  />
   <main class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 px-3 mt-2 gap-2">
     <TelaWhatsappCardInstanciaPadrao
       v-if="ehAdmin && instanciaPadrao?.instancia"
@@ -24,11 +27,18 @@
       @conectar="instanciaParaConectar = instancia"
       @desconectar="confirmarDesconexao(instancia.name)" -->
   </main>
+  <TelaWhatsappFormulario
+    v-model:visivel="formularioVisivel"
+    v-if="empresaSelecionada"
+    :empresa-id="empresaSelecionada?.id"
+    @atualizar-instancias="tentaObterInstancias"
+  />
 </template>
 <script lang="ts" setup>
   import TelaWhatsappCabecalho from '@/components/telas/tela-whatsapp/components/tela-whatsapp-cabecalho.vue';
   import TelaWhatsappCardInstanciaPadrao from '@/components/telas/tela-whatsapp/components/tela-whatsapp-card-instancia-padrao.vue';
   import TelaWhatsappCardInstancia from '@/components/telas/tela-whatsapp/components/tela-whatsapp-card-instancia.vue';
+  import TelaWhatsappFormulario from '@/components/telas/tela-whatsapp/components/tela-whatsapp-formulario.vue';
   import useApi from '@/composables/use-api';
   import useNotification from '@/composables/use-notification';
   import obterWhatsAppInstanciaPadrao, {
@@ -109,4 +119,6 @@
     tentaObterInstancias();
     tentaObterInstanciaPadrao();
   });
+
+  const formularioVisivel = ref(false);
 </script>
