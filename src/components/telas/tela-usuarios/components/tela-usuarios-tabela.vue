@@ -93,6 +93,6 @@
 
   const LEGENDA_CARGOS = {
     ADMIN: 'Admin',
-    NORMAL: 'Funcionário',
+    NORMAL: 'Normal',
   };
 </script>

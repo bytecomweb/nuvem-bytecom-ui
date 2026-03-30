@@ -2,11 +2,6 @@
   <div class="flex items-center gap-3">
     <div class="w-[320px] relative">
       <InputText v-model="busca" fluid type="text" placeholder="Buscar..." />
-      <span
-        v-if="temFiltroAtivo"
-        class="pi pi-times absolute right-3 top-3 cursor-pointer"
-        @click="emit('limpar')"
-      />
     </div>
 
     <Select
@@ -29,6 +24,13 @@
     />
 
     <Button icon="pi pi-search" rounded @click="emit('buscar')" />
+    <Button
+      icon="pi pi-filter-slash"
+      rounded
+      @click="emit('limpar')"
+      v-if="temFiltroAtivo"
+      severity="contrast"
+    />
   </div>
 </template>
 <script lang="ts" setup>
@@ -58,9 +60,7 @@
   });
 
   const temFiltroAtivo = computed(() => {
-    return (
-      !!busca.value || campo.value !== 'todos' || cargo.value !== 'todos' || !!empresaSelecionada
-    );
+    return !!busca.value || campo.value !== 'todos' || cargo.value !== 'todos';
   });
 
   const emit = defineEmits(['limpar', 'buscar']);

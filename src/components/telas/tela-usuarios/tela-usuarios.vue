@@ -229,7 +229,6 @@
     filtro.busca = '';
     filtro.campo = 'todos';
     filtro.cargo = 'todos';
-    empresaSelecionada.value = undefined;
     paginacao.paginaAtual = 1;
     carregarUsuarios();
   }
