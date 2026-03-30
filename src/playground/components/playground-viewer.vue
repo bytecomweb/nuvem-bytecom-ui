@@ -33,11 +33,15 @@
   });
 
   const propsComponente = computed(() => {
-    return { bearerToken: token.value };
+    return { bearerToken: token.value, ehAdmin: ehAdmin.value };
   });
 
   const token = computed(() => {
     return localStorage.getItem('token') || undefined;
+  });
+
+  const ehAdmin = computed(() => {
+    return localStorage.getItem('ehAdmin') === 'true';
   });
 </script>
 

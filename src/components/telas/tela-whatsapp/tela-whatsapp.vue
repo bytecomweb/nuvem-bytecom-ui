@@ -23,10 +23,10 @@
       :key="idx"
       @apagar="() => confirmarApagarInstancia(instancia.name)"
       @configurar="instanciaParaConfigurar = instancia"
+      @conectar="instanciaParaConectar = instancia"
     />
     <!-- 
       
-      @conectar="instanciaParaConectar = instancia"
       @desconectar="confirmarDesconexao(instancia.name)" -->
   </main>
   <TelaWhatsappFormulario
@@ -40,6 +40,12 @@
     v-if="empresaSelecionada"
     :empresa-id="empresaSelecionada.id"
   />
+  <TelaWhatsappConectarInstancia
+    v-model:instancia="instanciaParaConectar"
+    v-if="empresaSelecionada"
+    :empresa-id="empresaSelecionada.id"
+    @atualizarLista="tentaObterInstancias"
+  />
   <ConfirmDialog />
   <Toast />
 </template>
@@ -47,6 +53,7 @@
   import TelaWhatsappCabecalho from '@/components/telas/tela-whatsapp/components/tela-whatsapp-cabecalho.vue';
   import TelaWhatsappCardInstanciaPadrao from '@/components/telas/tela-whatsapp/components/tela-whatsapp-card-instancia-padrao.vue';
   import TelaWhatsappCardInstancia from '@/components/telas/tela-whatsapp/components/tela-whatsapp-card-instancia.vue';
+  import TelaWhatsappConectarInstancia from '@/components/telas/tela-whatsapp/components/tela-whatsapp-conectar-instancia.vue';
   import TelaWhatsappConfiguracaoFormulario from '@/components/telas/tela-whatsapp/components/tela-whatsapp-configuracao-formulario.vue';
   import TelaWhatsappFormulario from '@/components/telas/tela-whatsapp/components/tela-whatsapp-formulario.vue';
   import useApi from '@/composables/use-api';
@@ -178,4 +185,5 @@
   const formularioVisivel = ref(false);
 
   const instanciaParaConfigurar = ref<WhatsAppInstancia>();
+  const instanciaParaConectar = ref<WhatsAppInstancia>();
 </script>
