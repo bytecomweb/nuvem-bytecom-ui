@@ -6,36 +6,26 @@
       <Button label="Cadastrar usuário" icon="pi pi-plus" @click="emit('criar')" />
 
       <div class="w-[320px]">
-        <Select
+        <SelectEmpresa
           v-model="empresaSelecionada"
-          :options="empresas"
-          option-label="nomeVirtual"
-          placeholder="Empresa selecionada"
-          filter
-          fluid
-          :loading="carregando"
-          @show="busca = ''"
-          @filter="(e) => (busca = String(e.value || ''))"
-        >
-          <template #empty>
-            <p class="text-xs">Nenhuma empresa encontrada</p>
-          </template>
-          <template #emptyfilter>
-            <p class="text-xs">Nenhuma empresa encontrada</p>
-          </template>
-        </Select>
+          :api
+          selecionar-primeiro-automaticamente
+          filtro
+        />
       </div>
     </div>
   </header>
 </template>
 <script lang="ts" setup>
+  import SelectEmpresa from '@/components/telas/selects/select-empresa.vue';
   import { Empresa } from '@/types/modelos/empresa';
+  import { AxiosInstance } from 'axios';
   import { Button, Select } from 'primevue';
   import { ref } from 'vue';
 
-  const { empresas = [] } = defineProps<{
+  defineProps<{
     carregando?: boolean;
-    empresas?: Empresa[];
+    api: AxiosInstance;
   }>();
 
   const emit = defineEmits(['criar']);
@@ -43,6 +33,4 @@
   const empresaSelecionada = defineModel<Empresa | undefined>('empresa-selecionada', {
     required: true,
   });
-
-  const busca = ref('');
 </script>
