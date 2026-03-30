@@ -1,4 +1,4 @@
-import { useToast } from 'primevue';
+import { useToast } from 'primevue/usetoast';
 import type { ToastServiceMethods } from 'primevue/toastservice';
 
 export default function useNotification(notificacao: ToastServiceMethods = useToast()) {
