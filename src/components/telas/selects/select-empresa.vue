@@ -30,7 +30,9 @@
   import { Select } from 'primevue';
   import { onMounted, ref, useTemplateRef, watch } from 'vue';
 
-  const modelValue = defineModel<Empresa>();
+  const modelValue = defineModel<Empresa | undefined>({
+    required: true,
+  });
 
   const { selecionarPrimeiroAutomaticamente } = defineProps<{
     selecionarPrimeiroAutomaticamente?: boolean;

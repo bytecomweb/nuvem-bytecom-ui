@@ -5,7 +5,7 @@
       <p>{{ telaAtual?.descricao }}</p>
     </div>
 
-    <div class="viewer-content">
+    <div class="viewer-content" :id="componenteAtual">
       <component :is="componenteAtual" v-if="componenteAtual" v-bind="propsComponente" />
       <div v-else class="empty-state">
         <p>Selecione uma tela no menu lateral para começar</p>
@@ -33,13 +33,7 @@
   });
 
   const propsComponente = computed(() => {
-    const telaId = telaAtual.value?.id;
-
-    if (telaId === 'tela-usuarios') {
-      return { bearerToken: token.value };
-    }
-
-    return {};
+    return { bearerToken: token.value };
   });
 
   const token = computed(() => {

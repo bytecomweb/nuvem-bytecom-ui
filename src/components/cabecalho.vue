@@ -1,6 +1,6 @@
 <template>
   <header class="border-b p-3 flex justify-between items-center gap-3">
-    <h2>{{ titulo }}</h2>
+    <h1>{{ titulo }}</h1>
     <div class="flex items-center gap-3">
       <slot />
     </div>
