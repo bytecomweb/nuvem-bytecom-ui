@@ -3,6 +3,7 @@ import '@/style.css';
 import NuvemBytecomUi from '@/index';
 import App from './App.vue';
 import 'primeicons/primeicons.css';
+import '../style.css';
 
 createApp(App)
   .use(NuvemBytecomUi, {
