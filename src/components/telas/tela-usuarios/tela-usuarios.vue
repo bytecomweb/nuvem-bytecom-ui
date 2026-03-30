@@ -79,7 +79,7 @@
   const toast = useToast();
   const confirmacao = useConfirm();
 
-  const { erro } = useNotification();
+  const { erro, sucesso } = useNotification();
 
   const api = useApiService().instance;
 
@@ -272,6 +272,14 @@
       }
 
       modal.visivel = false;
+
+      const mensagem =
+        modal.modo === 'criar'
+          ? 'Usuário cadastrado com sucesso'
+          : 'Usuário atualizado com sucesso';
+
+      sucesso(mensagem);
+
       await carregarUsuarios();
     } catch (err) {
       erro(obterErroDaRequisicao(err) || 'Falha ao salvar usuário');
@@ -279,68 +287,6 @@
       modal.carregando = false;
     }
   });
-
-  // async function salvarUsuarioRequest() {
-  //   estaSalvandoUsuario.value = true;
-  //   try {
-  //     if (modal.modo === 'criar') {
-  //       await cadastrarUsuario(api, {
-  //         ...formulario,
-  //         empresasSelecionadas: empresaSelecionada.value
-  //           ? [{ id: empresaSelecionada.value.id, cargo: 'GERENTE' as const }]
-  //           : [],
-  //         sistemasParaAdicionar: [],
-  //       });
-
-  //       toast.add({
-  //         severity: 'success',
-  //         summary: 'Sucesso',
-  //         detail: 'Usuário cadastrado',
-  //         life: 2500,
-  //       });
-  //     } else {
-  //       const payload: Record<string, unknown> = {
-  //         nome: formulario.nome,
-  //         email: formulario.email.trim().toLowerCase(),
-  //         cnpjCpf: somenteNumeros(formulario.cnpjCpf),
-  //         cargo: formulario.cargo,
-  //       };
-
-  //       if (formulario.senha) {
-  //         payload.senha = formulario.senha;
-  //       }
-
-  //       await atualizarUsuarioPorId(api, modal.idUsuario, {
-  //         ...formulario,
-  //         empresas: empresaSelecionada.value
-  //           ? [{ id: empresaSelecionada.value.id, cargo: 'GERENTE' as const }]
-  //           : [],
-  //         sistemasParaAdicionar: [],
-  //         sistemasParaRemover: [],
-  //       });
-
-  //       toast.add({
-  //         severity: 'success',
-  //         summary: 'Sucesso',
-  //         detail: 'Usuário atualizado',
-  //         life: 2500,
-  //       });
-  //     }
-
-  //     modal.visivel = false;
-  //     await carregarUsuarios();
-  //   } catch {
-  //     toast.add({
-  //       severity: 'error',
-  //       summary: 'Erro',
-  //       detail:
-  //         modal.modo === 'criar' ? 'Falha ao cadastrar usuário' : 'Falha ao atualizar usuário',
-  //       life: 3000,
-  //     });
-  //   } finally {
-  //     estaSalvandoUsuario.value = false;
-  //   }
-  // }
 
   function confirmarRemocao(usuario: Usuario) {
     confirmacao.require({

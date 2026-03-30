@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center gap-3">
+  <div class="flex items-center justify-center gap-3 w-full">
     <div class="w-[320px] relative">
       <InputText v-model="busca" fluid type="text" placeholder="Buscar..." />
     </div>

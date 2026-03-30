@@ -2,7 +2,7 @@
   <Dialog
     v-model:visible="visivel"
     :header="modo === 'criar' ? 'Cadastrar usuário' : 'Editar usuário'"
-    class="w-155"
+    class="w-155!"
     modal
   >
     <form class="flex flex-col gap-4 mt-2" @submit.prevent>
@@ -49,7 +49,7 @@
     </form>
 
     <template #footer>
-      <div class="w-full flex justify-between">
+      <div class="w-full flex justify-between gap-3">
         <Button label="Empresas" severity="secondary" @click="selecaoEmpresasVisivel = true" />
         <div class="flex gap-2">
           <Button label="Cancelar" severity="secondary" @click="visivel = false" />

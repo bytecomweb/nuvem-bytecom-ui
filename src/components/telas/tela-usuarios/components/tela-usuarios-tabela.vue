@@ -7,6 +7,7 @@
     :total-records="total"
     :rows="paginacao.tamanhoPagina"
     :rows-per-page-options="[5, 20, 50, 100]"
+    :row-class="() => 'cursor-pointer'"
     :loading="carregando"
     row-hover
     @update:rows="
