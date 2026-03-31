@@ -20,6 +20,12 @@ const TELAS_DISPONIVEIS: TelaDemo[] = [
     descricao: 'Tela de WhatsApp reutilizável',
     grupo: 'Telas',
   },
+  {
+    id: 'tela-configuracao-2fa',
+    titulo: 'Configuração de 2FA',
+    descricao: 'Tela de configuração de autenticação em duas etapas',
+    grupo: 'Telas',
+  },
 ];
 
 const telaSelecionada = ref<string | null>(null);

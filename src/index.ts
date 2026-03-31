@@ -16,13 +16,15 @@ import {
   type ApiServiceConfig,
   type ApiServiceConfig as NuvemBytecomUiApiConfig,
 } from './services/api';
+import TelaConfiguracao2fa from '@/components/telas/tela-configuracao-2fa/tela-configuracao-2fa.vue';
 
 const components = {
   TelaUsuarios,
   TelaWhatsApp,
+  TelaConfiguracao2fa,
 };
 
-export { TelaUsuarios, TelaWhatsApp };
+export { TelaUsuarios, TelaWhatsApp, TelaConfiguracao2fa };
 export { API_SERVICE_KEY, configureApiService, createApiService, getApiService, useApiService };
 export type { ApiService, ApiServiceConfig, NuvemBytecomUiApiConfig };
 
