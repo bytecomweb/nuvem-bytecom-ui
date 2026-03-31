@@ -276,7 +276,7 @@
       await iniciarMonitoramentoWhatsAppInstanciaPadrao(api);
 
       setTimeout(() => {
-        tentaObterInstanciaPadrao;
+        tentaObterInstanciaPadrao();
       }, 150);
     } catch (err) {
       erro(
