@@ -76,17 +76,15 @@
 </template>
 <script lang="ts" setup>
   import { UsuarioEmpresa } from '@/components/telas/tela-usuarios/schemas/usuario-empresa-schema';
+  import useApi from '@/composables/use-api';
   import useNotification from '@/composables/use-notification';
   import obterEmpresasDoUsuario from '@/data/usuario/obter-empresas-do-usuario';
   import { Empresa } from '@/types/modelos/empresa';
   import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
-  import { AxiosInstance } from 'axios';
   import { AutoComplete, Button, Column, DataTable, Dialog, FloatLabel, Select } from 'primevue';
   import { ref, watch } from 'vue';
 
-  const { api } = defineProps<{
-    api: AxiosInstance;
-  }>();
+  const api = useApi();
 
   const { aviso, erro } = useNotification();
 

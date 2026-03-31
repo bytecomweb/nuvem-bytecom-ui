@@ -66,7 +66,6 @@
   <TelaUsuariosSelecaoEmpresa
     v-model:visivel="selecaoEmpresasVisivel"
     v-model:empresas-selecionadas="empresas"
-    :api
     @abrir:acessos="
       (idEmpresa) => {
         selecaoSistemas.empresaId = idEmpresa;
@@ -78,7 +77,6 @@
   <TelaUsuariosSelecaoSistema
     v-model:visivel="selecaoSistemas.visivel"
     :empresa-id="selecaoSistemas.empresaId"
-    :api
   />
 </template>
 <script lang="ts" setup>
@@ -86,9 +84,9 @@
   import TelaUsuariosSelecaoEmpresa from '@/components/telas/tela-usuarios/components/tela-usuarios-selecao-empresa.vue';
   import TelaUsuariosSelecaoSistema from '@/components/telas/tela-usuarios/components/tela-usuarios-selecao-sistema.vue';
   import { UsuarioEmpresa } from '@/components/telas/tela-usuarios/schemas/usuario-empresa-schema';
-  import { Usuario, UsuarioCargo } from '@/types/modelos/usuario';
+  import { UsuarioCargo } from '@/types/modelos/usuario';
   import { AxiosInstance } from 'axios';
-  import { Button, Dialog, FloatLabel, InputText, Password, Select } from 'primevue';
+  import { Button, Dialog, InputText, Password, Select } from 'primevue';
   import { useField } from 'vee-validate';
   import { reactive, ref, watch } from 'vue';
   import { vMaska } from 'maska/vue';
@@ -104,7 +102,6 @@
   defineProps<{
     usuarioId?: number;
     carregando?: boolean;
-    api: AxiosInstance;
     ehAdmin?: boolean;
   }>();
 

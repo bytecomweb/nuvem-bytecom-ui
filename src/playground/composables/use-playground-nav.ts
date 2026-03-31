@@ -15,10 +15,10 @@ const TELAS_DISPONIVEIS: TelaDemo[] = [
     grupo: 'Telas',
   },
   {
-    id: 'ui-button',
-    titulo: 'Button Component',
-    descricao: 'Componente de botão reutilizável',
-    grupo: 'Componentes',
+    id: 'tela-whatsapp',
+    titulo: 'Gestão de Instâncias de WhatsApp',
+    descricao: 'Tela de WhatsApp reutilizável',
+    grupo: 'Telas',
   },
 ];
 

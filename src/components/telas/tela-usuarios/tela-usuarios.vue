@@ -1,7 +1,6 @@
 <template>
   <TelaUsuariosCabecalho
     v-model:empresa-selecionada="empresaSelecionada"
-    :empresas
     @criar="abrirModalCriar"
   />
   <main class="px-4 mt-5 pb-10">
@@ -31,7 +30,6 @@
     :modo="modal.modo"
     :usuario-id="modal.idUsuario"
     :carregando="modal.carregando"
-    :api
     :eh-admin
     @salvar="tentaSalvarUsuario"
   />
@@ -66,24 +64,20 @@
   import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
   import { CAMPO_OBRIGATORIO } from '@/utils/constantes/feedback';
   import { UsuarioEmpresa } from '@/components/telas/tela-usuarios/schemas/usuario-empresa-schema';
+  import useApi from '@/composables/use-api';
 
   const props = defineProps<{
     bearerToken?: string;
     ehAdmin?: boolean;
   }>();
 
-  useApiService().setConfig({
-    bearerToken: props.bearerToken,
-  });
-
   const toast = useToast();
   const confirmacao = useConfirm();
 
   const { erro, sucesso } = useNotification();
 
-  const api = useApiService().instance;
+  const api = useApi(props.bearerToken);
 
-  const buscaEmpresa = ref('');
   const empresaSelecionada = ref<Empresa | undefined>(undefined);
 
   const filtro = reactive({
@@ -112,32 +106,9 @@
     },
   });
 
-  const empresas = ref<Empresa[]>([]);
-  const estaCarregandoEmpresas = ref(false);
-
   const usuarios = ref<Usuario[]>([]);
   const total = ref(0);
   const estaCarregandoUsuarios = ref(false);
-
-  async function carregarEmpresas() {
-    try {
-      estaCarregandoEmpresas.value = true;
-
-      const { dados } = await obterEmpresas(api, buscaEmpresa.value);
-
-      empresas.value = dados.map((empresa) => ({
-        ...empresa,
-        nomeVirtual:
-          empresa.nomeRazao.length > 30
-            ? `${empresa.nomeRazao.slice(0, 30)}...`
-            : empresa.nomeRazao,
-      }));
-    } catch (err) {
-      erro(obterErroDaRequisicao(err) || 'Não foi possível carregar as empresas');
-    } finally {
-      estaCarregandoEmpresas.value = false;
-    }
-  }
 
   async function carregarUsuarios() {
     try {
@@ -320,17 +291,5 @@
   watch([empresaSelecionada, () => filtro.campo, () => filtro.cargo], () => {
     paginacao.paginaAtual = 1;
     carregarUsuarios();
-  });
-
-  watch(buscaEmpresa, () => {
-    void carregarEmpresas();
-  });
-
-  onMounted(async () => {
-    await carregarEmpresas();
-
-    if (!empresaSelecionada.value) {
-      empresaSelecionada.value = empresas.value[0];
-    }
   });
 </script>

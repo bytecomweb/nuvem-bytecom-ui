@@ -6,36 +6,18 @@
       <Button label="Cadastrar usuário" icon="pi pi-plus" @click="emit('criar')" />
 
       <div class="w-[320px]">
-        <Select
-          v-model="empresaSelecionada"
-          :options="empresas"
-          option-label="nomeVirtual"
-          placeholder="Empresa selecionada"
-          filter
-          fluid
-          :loading="carregando"
-          @show="busca = ''"
-          @filter="(e) => (busca = String(e.value || ''))"
-        >
-          <template #empty>
-            <p class="text-xs">Nenhuma empresa encontrada</p>
-          </template>
-          <template #emptyfilter>
-            <p class="text-xs">Nenhuma empresa encontrada</p>
-          </template>
-        </Select>
+        <SelectEmpresa v-model="empresaSelecionada" selecionar-primeiro-automaticamente filtro />
       </div>
     </div>
   </header>
 </template>
 <script lang="ts" setup>
+  import SelectEmpresa from '@/components/selects/select-empresa.vue';
   import { Empresa } from '@/types/modelos/empresa';
-  import { Button, Select } from 'primevue';
-  import { ref } from 'vue';
+  import { Button } from 'primevue';
 
-  const { empresas = [] } = defineProps<{
+  defineProps<{
     carregando?: boolean;
-    empresas?: Empresa[];
   }>();
 
   const emit = defineEmits(['criar']);
@@ -43,6 +25,4 @@
   const empresaSelecionada = defineModel<Empresa | undefined>('empresa-selecionada', {
     required: true,
   });
-
-  const busca = ref('');
 </script>

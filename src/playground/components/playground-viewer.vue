@@ -5,7 +5,7 @@
       <p>{{ telaAtual?.descricao }}</p>
     </div>
 
-    <div class="viewer-content">
+    <div class="viewer-content" :id="componenteAtual">
       <component :is="componenteAtual" v-if="componenteAtual" v-bind="propsComponente" />
       <div v-else class="empty-state">
         <p>Selecione uma tela no menu lateral para começar</p>
@@ -18,11 +18,13 @@
   import { computed } from 'vue';
   import { usePlaygroundNav } from '../composables/use-playground-nav';
   import TelaUsuarios from '@/components/telas/tela-usuarios/tela-usuarios.vue';
+  import TelaWhatsapp from '@/components/telas/tela-whatsapp/tela-whatsapp.vue';
 
   const { telaAtual } = usePlaygroundNav();
 
   const componentesMap: Record<string, any> = {
     'tela-usuarios': TelaUsuarios,
+    'tela-whatsapp': TelaWhatsapp,
   };
 
   const componenteAtual = computed(() => {
@@ -31,17 +33,15 @@
   });
 
   const propsComponente = computed(() => {
-    const telaId = telaAtual.value?.id;
-
-    if (telaId === 'tela-usuarios') {
-      return { bearerToken: token.value };
-    }
-
-    return {};
+    return { bearerToken: token.value, ehAdmin: ehAdmin.value };
   });
 
   const token = computed(() => {
     return localStorage.getItem('token') || undefined;
+  });
+
+  const ehAdmin = computed(() => {
+    return localStorage.getItem('ehAdmin') === 'true';
   });
 </script>
 
