@@ -19,12 +19,14 @@
   import { usePlaygroundNav } from '../composables/use-playground-nav';
   import TelaUsuarios from '@/components/telas/tela-usuarios/tela-usuarios.vue';
   import TelaWhatsapp from '@/components/telas/tela-whatsapp/tela-whatsapp.vue';
+  import TelaConfiguracao2fa from '@/components/telas/tela-configuracao-2fa/tela-configuracao-2fa.vue';
 
   const { telaAtual } = usePlaygroundNav();
 
   const componentesMap: Record<string, any> = {
     'tela-usuarios': TelaUsuarios,
     'tela-whatsapp': TelaWhatsapp,
+    'tela-configuracao-2fa': TelaConfiguracao2fa,
   };
 
   const componenteAtual = computed(() => {

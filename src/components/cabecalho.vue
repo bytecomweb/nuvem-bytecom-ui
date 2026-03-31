@@ -1,6 +1,11 @@
 <template>
   <header class="border-b p-3 flex justify-between items-center gap-3">
-    <h1>{{ titulo }}</h1>
+    <div>
+      <h1>{{ titulo }}</h1>
+      <p v-if="descricao" class="text-sm text-gray-500">
+        {{ descricao }}
+      </p>
+    </div>
     <div class="flex items-center gap-3">
       <slot />
     </div>
@@ -9,5 +14,6 @@
 <script lang="ts" setup>
   defineProps<{
     titulo: string;
+    descricao?: string;
   }>();
 </script>
