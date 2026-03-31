@@ -5,6 +5,7 @@ import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 import type { App, Plugin } from 'vue';
 import TelaUsuarios from '@/components/telas/tela-usuarios/tela-usuarios.vue';
+import TelaWhatsApp from '@/components/telas/tela-whatsapp/tela-whatsapp.vue';
 import {
   API_SERVICE_KEY,
   configureApiService,
@@ -18,9 +19,10 @@ import {
 
 const components = {
   TelaUsuarios,
+  TelaWhatsApp,
 };
 
-export { TelaUsuarios };
+export { TelaUsuarios, TelaWhatsApp };
 export { API_SERVICE_KEY, configureApiService, createApiService, getApiService, useApiService };
 export type { ApiService, ApiServiceConfig, NuvemBytecomUiApiConfig };
 
