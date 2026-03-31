@@ -131,6 +131,20 @@
       </div>
     </div>
   </main>
+  <TelaConfiguracao2faConfigurarTotp
+    v-model:visivel="dialogTotpVisivel"
+    v-model:metodoTotpAtivo="metodoTotpAtivo"
+    v-model:segredoTotp="segredoTotp"
+    v-model:otpauthUrl="otpauthUrl"
+    v-model:codigoAtivacaoTotp="codigoAtivacaoTotp"
+    v-model:carregandoConfiguracaoTotp="carregandoConfiguracaoTotp"
+    v-model:ativandoTotp="ativandoTotp"
+    v-model:qr-code-totp="qrCodeTotp"
+    :metodos="metodos"
+    @configurar="tentaConfigurarTotp"
+    @desativar="tentaDesativarTotp"
+    @ativar="tentaAtivarTotp"
+  />
   <Toast />
 </template>
 <script lang="ts" setup>
@@ -150,6 +164,8 @@
   import solicitarDesafio2FA from '@/data/2fa/solicitar-desafio-2fa';
   import verificarDesafio2FA from '@/data/2fa/verificar-desafio-2fa';
   import { vMaska } from 'maska/vue';
+  import TelaConfiguracao2faConfigurarTotp from '@/components/telas/tela-configuracao-2fa/components/tela-configuracao-2fa-configurar-totp.vue';
+  import ativarTotp from '@/data/2fa/ativar-totp';
 
   const { bearerToken } = defineProps<{
     bearerToken: string;
@@ -194,6 +210,9 @@
   const carregando = ref(false);
 
   const metodosAtivos = computed(() => metodos.value.filter((metodo) => metodo.ativo).length);
+  const metodoTotpAtivo = computed(
+    () => !!metodos.value.find((metodo) => metodo.metodo === 'TOTP')?.ativo
+  );
 
   const metodos = ref<MetodoTela[]>([]);
 
@@ -412,7 +431,56 @@
     }
   };
 
+  const tentaAtivarTotp = async () => {
+    const codigo = String(codigoAtivacaoTotp.value || '')
+      .replace(/\D/g, '')
+      .slice(0, 6);
+
+    if (codigo.length < 6) {
+      return notificacao.erro('Digite os 6 números do código');
+    }
+
+    try {
+      ativandoTotp.value = true;
+
+      await ativarTotp(api, codigo);
+
+      codigoAtivacaoTotp.value = '';
+      await tentaObterMetodos();
+      qrCodeTotp.value = '';
+      dialogTotpVisivel.value = false;
+
+      notificacao.sucesso('Verificação por aplicativo ativada com sucesso');
+    } catch (erro) {
+      notificacao.erro(
+        obterErroDaRequisicao(erro) || 'Não foi possível ativar a verificação por aplicativo'
+      );
+    } finally {
+      ativandoTotp.value = false;
+    }
+  };
+
   onMounted(() => {
     tentaObterMetodos();
   });
 </script>
+<style scoped>
+  :deep(.otp-totp-config.p-inputotp) {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  :deep(.otp-totp-config .p-inputotp-input) {
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+  }
+
+  @media (max-width: 420px) {
+    :deep(.otp-totp-config.p-inputotp) {
+      gap: 0.35rem;
+    }
+  }
+</style>
