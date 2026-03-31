@@ -11,12 +11,11 @@
       :monitoramento="instanciaPadrao.monitoramento"
       :bloqueado="instanciaPadrao.configuracao.bloquearInstanciaPadraoWhatsApp"
       @atualizar="tentaObterInstanciaPadrao"
-    />
-    <!-- @atualizar="refreshInstanciaPadrao"
-      @conectar="modalInstanciaPadraoConectarVisivel = true"
+      @conectar="conectarInstanciaPadraoVisivel = true"
       @desconectar="confirmarDesconexaoInstanciaPadrao"
       @iniciar-monitoramento="tentaIniciarMonitoramentoInstanciaPadrao"
-      @parar-monitoramento="tentaPararMonitoramentoInstanciaPadrao" -->
+      @parar-monitoramento="tentaPararMonitoramentoInstanciaPadrao"
+    />
     <TelaWhatsappCardInstancia
       v-for="(instancia, idx) in instanciasTratadas"
       :instancia
@@ -65,10 +64,13 @@
   import useNotification from '@/composables/use-notification';
   import apagarWhatsAppInstancia from '@/data/whatsapp/apagar-whatsapp-instancia';
   import desconectarWhatsAppInstancia from '@/data/whatsapp/desconectar-whatsapp-instancia';
+  import desconectarWhatsAppInstanciaPadrao from '@/data/whatsapp/desconectar-whatsapp-instancia-padrao';
+  import iniciarMonitoramentoWhatsAppInstanciaPadrao from '@/data/whatsapp/iniciar-monitoramento-whatsapp-instancia-padrao';
   import obterWhatsAppInstanciaPadrao, {
     DadosInstanciaPadrao,
   } from '@/data/whatsapp/obter-whatsapp-instancia-padrao';
   import obterWhatsAppInstancias from '@/data/whatsapp/obter-whatsapp-instancias';
+  import pararMonitoramentoDaWhatsAppInstanciaPadrao from '@/data/whatsapp/parar-monitoramento-da-whatsapp-instancia-padrao';
   import { Empresa } from '@/types/modelos/empresa';
   import { WhatsAppInstancia } from '@/types/modelos/whatsapp-instancia';
   import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
@@ -234,4 +236,66 @@
   };
 
   const conectarInstanciaPadraoVisivel = ref(false);
+
+  const confirmarDesconexaoInstanciaPadrao = () => {
+    confirm.require({
+      header: 'Desconectar instância padrão?',
+      message: 'Deseja realmente desconectar a instância padrão do WhatsApp?',
+      acceptLabel: 'Desconectar',
+      acceptProps: {
+        severity: 'danger',
+      },
+      rejectLabel: 'Cancelar',
+      rejectProps: {
+        severity: 'secondary',
+      },
+      accept() {
+        tentaDesconectarInstanciaPadrao();
+      },
+    });
+  };
+
+  const tentaDesconectarInstanciaPadrao = async () => {
+    try {
+      if (!empresaSelecionada.value) {
+        return;
+      }
+
+      await desconectarWhatsAppInstanciaPadrao(api, empresaSelecionada.value.id);
+
+      setTimeout(() => {
+        tentaObterInstanciaPadrao();
+      }, 150);
+    } catch (err) {
+      erro(obterErroDaRequisicao(err) || 'Não foi possível desconectar a instância padrão');
+    }
+  };
+
+  const tentaIniciarMonitoramentoInstanciaPadrao = async () => {
+    try {
+      await iniciarMonitoramentoWhatsAppInstanciaPadrao(api);
+
+      setTimeout(() => {
+        tentaObterInstanciaPadrao;
+      }, 150);
+    } catch (err) {
+      erro(
+        obterErroDaRequisicao(err) || 'Não foi possível iniciar monitoramento da instância padrão'
+      );
+    }
+  };
+
+  const tentaPararMonitoramentoInstanciaPadrao = async () => {
+    try {
+      await pararMonitoramentoDaWhatsAppInstanciaPadrao(api);
+
+      setTimeout(() => {
+        tentaObterInstanciaPadrao();
+      }, 150);
+    } catch (err) {
+      erro(
+        obterErroDaRequisicao(err) || 'Não foi possível parar monitoramento da instância padrão'
+      );
+    }
+  };
 </script>
