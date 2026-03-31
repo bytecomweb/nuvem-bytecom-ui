@@ -181,6 +181,8 @@
       setTimeout(() => {
         tentaObterInstancias();
       }, 150);
+
+      sucesso('Instância apagada com sucesso');
     } catch (err) {
       erro(obterErroDaRequisicao(err) || 'Não foi possível apagar instância');
     }
