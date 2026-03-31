@@ -77,8 +77,9 @@
   import apenasNumeros from '@/utils/texto/apenas-numeros';
   import formatarTexto from '@/utils/texto/formatar-texto';
   import removerSimbolos from '@/utils/texto/remover-simbolos';
-  import { ConfirmDialog, Toast, useConfirm } from 'primevue';
+  import { ConfirmDialog, Toast } from 'primevue';
   import { computed, onMounted, ref, watch } from 'vue';
+  import { useConfirm } from 'primevue/useconfirm';
 
   const { bearerToken, ehAdmin } = defineProps<{
     bearerToken: string;
