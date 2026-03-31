@@ -1,5 +1,5 @@
 <template>
-  <header class="border-b p-3 flex justify-between items-center gap-3">
+  <header class="border-b p-3 flex justify-between items-center gap-3 border-b-gray-200">
     <div>
       <h1>{{ titulo }}</h1>
       <p v-if="descricao" class="text-sm text-gray-500">

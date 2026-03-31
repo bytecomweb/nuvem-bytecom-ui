@@ -1,7 +1,5 @@
 <template>
-  <header class="border-b p-3 flex justify-between items-center gap-3">
-    <h2>Usuários</h2>
-
+  <Cabecalho titulo="Usuários">
     <div class="flex items-center gap-3">
       <Button label="Cadastrar usuário" icon="pi pi-plus" @click="emit('criar')" />
 
@@ -9,9 +7,10 @@
         <SelectEmpresa v-model="empresaSelecionada" selecionar-primeiro-automaticamente filtro />
       </div>
     </div>
-  </header>
+  </Cabecalho>
 </template>
 <script lang="ts" setup>
+  import Cabecalho from '@/components/cabecalho.vue';
   import SelectEmpresa from '@/components/selects/select-empresa.vue';
   import { Empresa } from '@/types/modelos/empresa';
   import { Button } from 'primevue';

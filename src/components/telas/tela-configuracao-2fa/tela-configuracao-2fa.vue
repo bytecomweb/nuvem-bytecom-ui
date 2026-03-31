@@ -2,11 +2,15 @@
   <TelaConfiguracao2faCabecalho />
   <main class="px-4 mt-5 pb-10 space-y-4">
     <div class="grid grid-cols-1 gap-3">
-      <div class="border rounded-lg p-3 bg-white">
+      <div class="border rounded-lg p-3 bg-white border-gray-200">
         <p class="text-xs text-gray-500">Formas ativas</p>
         <p class="text-lg font-semibold">{{ metodosAtivos }}</p>
       </div>
-      <div v-for="metodo in metodos" :key="metodo.metodo" class="rounded-lg p-4 bg-white border">
+      <div
+        v-for="metodo in metodos"
+        :key="metodo.metodo"
+        class="rounded-lg p-4 bg-white border border-gray-200"
+      >
         <div class="flex items-start justify-between gap-3">
           <div class="flex items-start gap-3">
             <div
