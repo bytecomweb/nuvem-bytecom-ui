@@ -3,7 +3,7 @@
     v-model:empresa-selecionada="empresaSelecionada"
     @criar="formularioVisivel = true"
   />
-  <main class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 px-3 mt-2 gap-2">
+  <main class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 px-3! mt-3! gap-2">
     <TelaWhatsappCardInstanciaPadrao
       v-if="ehAdmin && instanciaPadrao?.instancia"
       :instancia="instanciaPadrao.instancia"

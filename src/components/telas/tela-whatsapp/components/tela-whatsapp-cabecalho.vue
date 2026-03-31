@@ -1,12 +1,9 @@
 <template>
   <Cabecalho titulo="WhatsApp">
     <Button label="Criar instância" icon="pi pi-plus" @click="emit('criar')" />
-    <SelectEmpresa
-      class="w-[320px]!"
-      selecionar-primeiro-automaticamente
-      filtro
-      v-model="empresaSelecionada"
-    />
+    <div class="w-[320px]!">
+      <SelectEmpresa selecionar-primeiro-automaticamente filtro v-model="empresaSelecionada" />
+    </div>
   </Cabecalho>
 </template>
 <script lang="ts" setup>
