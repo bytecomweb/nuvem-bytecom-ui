@@ -166,6 +166,7 @@
   import { vMaska } from 'maska/vue';
   import TelaConfiguracao2faConfigurarTotp from '@/components/telas/tela-configuracao-2fa/components/tela-configuracao-2fa-configurar-totp.vue';
   import ativarTotp from '@/data/2fa/ativar-totp';
+  import { watch } from 'vue';
 
   const { bearerToken } = defineProps<{
     bearerToken: string;
@@ -462,6 +463,10 @@
 
   onMounted(() => {
     tentaObterMetodos();
+  });
+
+  watch(otpauthUrl, () => {
+    atualizarQrCodeTotp();
   });
 </script>
 <style scoped>
