@@ -10,6 +10,7 @@
       :conexao="instanciaPadrao.conexao"
       :monitoramento="instanciaPadrao.monitoramento"
       :bloqueado="instanciaPadrao.configuracao.bloquearInstanciaPadraoWhatsApp"
+      @atualizar="tentaObterInstanciaPadrao"
     />
     <!-- @atualizar="refreshInstanciaPadrao"
       @conectar="modalInstanciaPadraoConectarVisivel = true"
@@ -44,6 +45,11 @@
     :empresa-id="empresaSelecionada.id"
     @atualizarLista="tentaObterInstancias"
   />
+  <TelaWhatsappConectarInstanciaPadrao
+    v-if="empresaSelecionada"
+    v-model:visivel="conectarInstanciaPadraoVisivel"
+    :empresa-id="empresaSelecionada.id"
+  />
   <ConfirmDialog />
   <Toast />
 </template>
@@ -51,6 +57,7 @@
   import TelaWhatsappCabecalho from '@/components/telas/tela-whatsapp/components/tela-whatsapp-cabecalho.vue';
   import TelaWhatsappCardInstanciaPadrao from '@/components/telas/tela-whatsapp/components/tela-whatsapp-card-instancia-padrao.vue';
   import TelaWhatsappCardInstancia from '@/components/telas/tela-whatsapp/components/tela-whatsapp-card-instancia.vue';
+  import TelaWhatsappConectarInstanciaPadrao from '@/components/telas/tela-whatsapp/components/tela-whatsapp-conectar-instancia-padrao.vue';
   import TelaWhatsappConectarInstancia from '@/components/telas/tela-whatsapp/components/tela-whatsapp-conectar-instancia.vue';
   import TelaWhatsappConfiguracaoFormulario from '@/components/telas/tela-whatsapp/components/tela-whatsapp-configuracao-formulario.vue';
   import TelaWhatsappFormulario from '@/components/telas/tela-whatsapp/components/tela-whatsapp-formulario.vue';
@@ -225,4 +232,6 @@
       erro(obterErroDaRequisicao(err) || 'Não foi possível desconectar');
     }
   };
+
+  const conectarInstanciaPadraoVisivel = ref(false);
 </script>
