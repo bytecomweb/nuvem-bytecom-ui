@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white p-2 rounded-lg flex justify-between gap-3 border shadow">
+  <div class="bg-white p-2 rounded-lg flex justify-between gap-3 border border-gray-200 shadow">
     <div class="flex flex-col justify-between gap-6">
       <p>
         {{
