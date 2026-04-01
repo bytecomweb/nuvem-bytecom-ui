@@ -101,6 +101,7 @@
   const { resetForm, handleSubmit, setFieldError } = useForm({
     validationSchema: toTypedSchema(usuarioFormularioSchema),
     initialValues: {
+      whatsapp: '',
       empresas: [],
       cargo: 'NORMAL',
     },
@@ -154,6 +155,11 @@
 
     resetForm({
       values: {
+        nome: '',
+        email: '',
+        whatsapp: '',
+        cnpjCpf: '',
+        senha: '',
         cargo: 'NORMAL',
         empresas,
         sistemasParaAdicionar: [],
@@ -174,6 +180,7 @@
       values: {
         nome: usuario.nome,
         email: usuario.email,
+        whatsapp: usuario.whatsapp || '',
         cnpjCpf: usuario.cnpjCpf,
         cargo: usuario.cargo === 'ADMIN' ? 'ADMIN' : 'NORMAL',
         senha: '',

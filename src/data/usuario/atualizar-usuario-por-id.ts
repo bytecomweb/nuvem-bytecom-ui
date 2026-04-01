@@ -2,7 +2,10 @@ import { Usuario } from '@/types/modelos/usuario';
 import { RespostaSucesso } from '@/types/respostas/resposta-sucesso';
 import { AxiosInstance } from 'axios';
 
-type AtualizarUsuarioPorIdParametros = Pick<Usuario, 'nome' | 'cargo' | 'cnpjCpf' | 'email'> & {
+type AtualizarUsuarioPorIdParametros = Pick<
+  Usuario,
+  'nome' | 'cargo' | 'cnpjCpf' | 'email' | 'whatsapp'
+> & {
   senha?: string;
   empresas: {
     id: number;

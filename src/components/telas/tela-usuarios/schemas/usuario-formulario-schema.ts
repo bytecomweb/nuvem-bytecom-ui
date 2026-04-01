@@ -22,6 +22,10 @@ export const usuarioFormularioSchema = z.object({
       required_error: CAMPO_OBRIGATORIO,
     })
     .email(CAMPO_INVALIDO),
+  whatsapp: z
+    .string()
+    .optional()
+    .transform((valor) => apenasNumeros(valor || '')),
   cargo: z.enum(['ADMIN', 'NORMAL'], {
     invalid_type_error: CAMPO_INVALIDO,
   }),

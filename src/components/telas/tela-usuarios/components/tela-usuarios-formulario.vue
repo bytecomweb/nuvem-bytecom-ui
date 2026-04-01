@@ -14,6 +14,15 @@
         <InputText id="email" v-model="emailValue" fluid type="email" :invalid="!!emailError" />
       </Label>
 
+      <Label label="WhatsApp" :feedback="whatsappError">
+        <InputMask
+          id="whatsapp"
+          v-model="whatsappValue"
+          :mask="whatsappMascara"
+          :invalid="!!whatsappError"
+        />
+      </Label>
+
       <Label label="CNPJ/CPF" :feedback="cnpjCpfError">
         <InputText
           id="cnpjCpf"
@@ -81,11 +90,11 @@
 </template>
 <script lang="ts" setup>
   import Label from '@/components/label.vue';
+  import InputMask from '@/components/inputs/input-mask.vue';
   import TelaUsuariosSelecaoEmpresa from '@/components/telas/tela-usuarios/components/tela-usuarios-selecao-empresa.vue';
   import TelaUsuariosSelecaoSistema from '@/components/telas/tela-usuarios/components/tela-usuarios-selecao-sistema.vue';
   import { UsuarioEmpresa } from '@/components/telas/tela-usuarios/schemas/usuario-empresa-schema';
   import { UsuarioCargo } from '@/types/modelos/usuario';
-  import { AxiosInstance } from 'axios';
   import { Button, Dialog, InputText, Password, Select } from 'primevue';
   import { useField } from 'vee-validate';
   import { reactive, ref, watch } from 'vue';
@@ -108,6 +117,8 @@
   const { value: nomeValue, errorMessage: nomeError } = useField<string>('nome');
 
   const { value: emailValue, errorMessage: emailError } = useField<string>('email');
+
+  const { value: whatsappValue, errorMessage: whatsappError } = useField<string>('whatsapp');
 
   const { value: cnpjCpfValue, errorMessage: cnpjCpfError } = useField<string>('cnpjCpf');
 
@@ -140,4 +151,6 @@
   const cnpjCpfMascara = {
     mask: ['###.###.###-##', '##.###.###/####-##'],
   };
+
+  const whatsappMascara = ['+55 (##) # ####-####', '+55 (##) ####-####'];
 </script>

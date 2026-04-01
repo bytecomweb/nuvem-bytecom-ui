@@ -4,7 +4,7 @@ import { AxiosInstance } from 'axios';
 
 type CadastrarUsuarioParametros = Pick<
   Usuario,
-  'nome' | 'cargo' | 'senha' | 'cnpjCpf' | 'email'
+  'nome' | 'cargo' | 'senha' | 'cnpjCpf' | 'email' | 'whatsapp'
 > & {
   empresasSelecionadas: {
     cargo: 'GERENTE' | 'NORMAL';

@@ -4,6 +4,7 @@ export type Usuario = {
   id: number;
   nome: string;
   email: string;
+  whatsapp?: string;
   cnpjCpf: string;
   senha: string;
   cargo: UsuarioCargo;
