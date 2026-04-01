@@ -1,5 +1,5 @@
 import { CAMPO_INVALIDO, CAMPO_OBRIGATORIO } from '@/utils/constantes/feedback';
-import { isValidCNPJ, isValidCPF } from '@brazilian-utils/brazilian-utils';
+import apenasNumeros from '@/utils/texto/apenas-numeros';
 import z from 'zod';
 
 export const cnpjOuCpfSchema = z
@@ -7,7 +7,9 @@ export const cnpjOuCpfSchema = z
     required_error: CAMPO_OBRIGATORIO,
   })
   .superRefine((valor, ctx) => {
-    if (isValidCPF(valor) || isValidCNPJ(valor)) {
+    const quantidadeDigitos = apenasNumeros(valor).length;
+
+    if (quantidadeDigitos === 11 || quantidadeDigitos === 14) {
       return;
     }
 
