@@ -1,28 +1,43 @@
 <template>
-  <div class="bg-white p-2 rounded-lg flex justify-between gap-3 border border-gray-200 shadow">
-    <div class="flex flex-col justify-between gap-6">
-      <p>
+  <div
+    class="bg-white p-2 rounded-lg flex justify-between gap-3 shadow"
+    :class="instancia.ehInstanciaPadrao ? 'border-2 border-orange-200' : 'border border-gray-200'"
+  >
+    <div class="flex flex-col justify-between gap-4">
+      <div v-if="instancia.ehInstanciaPadrao" class="flex items-center gap-2">
+        <i class="pi pi-star-fill text-orange-400" />
+        <p class="font-semibold">Instância padrão</p>
+      </div>
+
+      <p v-if="!instancia.ehInstanciaPadrao">
         {{
-          instancia.ehInstanciaPadrao
-            ? instancia.titulo
-            : formatarTexto({
-                texto: removerSimbolos(instancia.name),
-                mascara: [
-                  '(00) 0000-0000',
-                  '(00) 0 0000-0000',
-                  '+00 (00) 0000-0000',
-                  '+00 (00) 0 0000-0000',
-                ],
-              })
+          formatarTexto({
+            texto: removerSimbolos(instancia.name),
+            mascara: [
+              '(00) 0000-0000',
+              '(00) 0 0000-0000',
+              '+00 (00) 0000-0000',
+              '+00 (00) 0 0000-0000',
+            ],
+          })
         }}
       </p>
-      <Tag
-        :value="textoStatus[instancia.connectionStatus]"
-        :severity="grauStatus[instancia.connectionStatus]"
-      />
+
+      <div class="flex flex-wrap gap-2">
+        <Tag
+          :value="textoStatus[instancia.connectionStatus]"
+          :severity="grauStatus[instancia.connectionStatus]"
+        />
+        <Tag
+          v-if="instancia.ehInstanciaPadrao && gerenciamentoRestrito"
+          value="Gerenciamento restrito"
+          severity="warn"
+        />
+      </div>
     </div>
+
     <div class="flex flex-col justify-between items-end gap-2">
-      <div>
+      <div v-if="!gerenciamentoRestrito">
         <Button
           icon="pi pi-trash"
           size="small"
@@ -38,6 +53,7 @@
           v-tooltip="'Configurações'"
         />
       </div>
+
       <Button
         label="Conectar"
         size="small"
@@ -51,6 +67,12 @@
         v-else-if="!gerenciamentoRestrito && instancia.connectionStatus === 'open'"
         @click="emit('desconectar')"
       />
+      <span
+        v-else-if="instancia.ehInstanciaPadrao"
+        class="text-xs text-zinc-500 text-right max-w-36"
+      >
+        Esta instância é exibida apenas para consulta.
+      </span>
     </div>
   </div>
 </template>
@@ -61,7 +83,7 @@
   import removerSimbolos from '@/utils/texto/remover-simbolos';
   import { Button, Tag, type TagProps } from 'primevue';
 
-  const props = defineProps<{
+  defineProps<{
     instancia: WhatsAppInstancia;
     gerenciamentoRestrito?: boolean;
   }>();

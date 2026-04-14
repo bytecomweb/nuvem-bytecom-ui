@@ -26,7 +26,7 @@
     <TelaWhatsappCardInstancia
       v-for="(instancia, idx) in instanciasTratadas"
       :instancia
-      :gerenciamento-restrito="instancia.podeGerenciar === false"
+      :gerenciamento-restrito="instancia.podeGerenciar === false || instancia.ehInstanciaPadrao === true"
       :key="idx"
       @apagar="() => confirmarApagarInstancia(instancia.name)"
       @configurar="instanciaParaConfigurar = instancia"
@@ -134,7 +134,7 @@
 
   const tentaObterInstanciaPadrao = async () => {
     try {
-      if (!empresaSelecionada.value) return;
+      if (!empresaSelecionada.value || !ehAdmin) return;
 
       const { dados } = await obterWhatsAppInstanciaPadrao(api, empresaSelecionada.value.id);
 
