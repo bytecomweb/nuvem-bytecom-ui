@@ -140,6 +140,7 @@ export function setupMockApi() {
             status: 'ok',
             autorizado: {
               id: 8,
+              nome: 'Tomas Lima',
               email: 'tomas153lm@gmail.com',
               sistemas: ['Ótica', 'Ótica'],
               cargo: 'ADMIN',
@@ -167,6 +168,7 @@ export function setupMockApi() {
             status: 'ok',
             autorizado: {
               id: 8,
+              nome: 'Tomas Lima',
               email: 'tomas153lm@gmail.com',
               sistemas: ['Ótica', 'Ótica'],
               cargo: 'ADMIN',
@@ -270,6 +272,9 @@ export function setupMockApi() {
       }
 
       if (config.url === '/usuarios/me' && config.method === 'patch') {
+        const nome = typeof body.nome === 'string' ? body.nome.trim() : '';
+        const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+
         if (!body.senhaAtual) {
           return Promise.resolve({
             status: 400,
@@ -277,10 +282,17 @@ export function setupMockApi() {
           });
         }
 
-        if (!body.email && !body.senhaNova) {
+        if (!nome && !email && !body.senhaNova) {
           return Promise.resolve({
             status: 400,
-            data: { erro: true, mensagem: 'Informe e-mail ou nova senha' },
+            data: { erro: true, mensagem: 'Informe nome, e-mail ou nova senha' },
+          });
+        }
+
+        if (nome && (nome.length < 3 || nome.length > 125)) {
+          return Promise.resolve({
+            status: 400,
+            data: { erro: true, mensagem: 'Nome deve conter entre 3 e 125 caracteres' },
           });
         }
 
@@ -298,7 +310,7 @@ export function setupMockApi() {
           });
         }
 
-        if (body.email === 'email-em-uso@teste.com') {
+        if (email === 'email-em-uso@teste.com') {
           return Promise.resolve({
             status: 409,
             data: { erro: true, mensagem: 'E-mail já está em uso' },
@@ -307,8 +319,12 @@ export function setupMockApi() {
 
         const usuario = usuariosMock[0];
 
-        if (usuario && body.email) {
-          usuario.email = body.email;
+        if (usuario && nome) {
+          usuario.nome = nome;
+        }
+
+        if (usuario && email) {
+          usuario.email = email;
         }
 
         return Promise.resolve({
@@ -318,7 +334,8 @@ export function setupMockApi() {
             mensagem: 'Dados básicos atualizados com sucesso',
             dados: {
               id: usuario?.id || 1,
-              email: usuario?.email || body.email || 'novo@email.com',
+              nome: usuario?.nome || nome || 'Usuário teste',
+              email: usuario?.email || email || 'novo@email.com',
             },
           },
         });

@@ -7,10 +7,16 @@
     >
       <div class="space-y-1">
         <h2 class="text-lg font-semibold text-gray-800">Dados básicos</h2>
-        <p class="text-sm text-gray-500">Atualize seu e-mail e confirme com a senha atual.</p>
+        <p class="text-sm text-gray-500">
+          Atualize seu nome e/ou e-mail e confirme com a senha atual.
+        </p>
       </div>
 
-      <form class="flex flex-col gap-4" @submit.prevent="tentaSalvarEmail">
+      <form class="flex flex-col gap-4" @submit.prevent="tentaSalvarDadosBasicos">
+        <Label label="Nome" :feedback="nomeError">
+          <InputText id="nome" v-model="nomeValue" fluid :invalid="!!nomeError" />
+        </Label>
+
         <Label label="E-mail" :feedback="emailError">
           <InputText id="email" v-model="emailValue" type="email" fluid :invalid="!!emailError" />
         </Label>
@@ -28,7 +34,12 @@
         </Label>
 
         <div class="pt-1 flex justify-end">
-          <Button type="submit" label="Salvar e-mail" icon="pi pi-save" :loading="salvandoEmail" />
+          <Button
+            type="submit"
+            label="Salvar dados básicos"
+            icon="pi pi-save"
+            :loading="salvandoDadosBasicos"
+          />
         </div>
       </form>
 
@@ -120,6 +131,7 @@
   const props = defineProps<{
     bearerToken?: string;
     ehAdmin?: boolean;
+    nome?: string;
     email?: string;
   }>();
 
@@ -131,6 +143,8 @@
 
   const { sucesso, erro, aviso } = useNotification();
 
+  const nomeAtual = ref(props.nome || '');
+  const nomeValue = ref(props.nome || '');
   const emailAtual = ref(props.email || '');
   const emailValue = ref(props.email || '');
   const senhaAtualEmail = ref('');
@@ -138,6 +152,7 @@
   const senhaNova = ref('');
   const confirmacaoSenhaNova = ref('');
 
+  const nomeError = ref('');
   const emailError = ref('');
   const senhaAtualEmailError = ref('');
   const senhaAtualSenhaError = ref('');
@@ -146,13 +161,19 @@
 
   const modalTrocarSenhaVisivel = ref(false);
 
-  const salvandoEmail = ref(false);
+  const salvandoDadosBasicos = ref(false);
   const salvandoSenha = ref(false);
 
   const tentaPreencherEmailAutorizado = async () => {
     try {
       const resposta = await obterUsuarioAutorizado(api);
+      const nomeAutorizado = resposta.autorizado?.nome?.trim();
       const emailAutorizado = resposta.autorizado?.email?.trim();
+
+      if (nomeAutorizado) {
+        nomeAtual.value = nomeAutorizado;
+        nomeValue.value = nomeAutorizado;
+      }
 
       if (emailAutorizado) {
         emailAtual.value = emailAutorizado;
@@ -167,7 +188,8 @@
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  const limparErrosEmail = () => {
+  const limparErrosDadosBasicos = () => {
+    nomeError.value = '';
     emailError.value = '';
     senhaAtualEmailError.value = '';
   };
@@ -183,18 +205,29 @@
     emit('relogin-requerido');
   };
 
-  const tentaSalvarEmail = async () => {
-    limparErrosEmail();
+  const tentaSalvarDadosBasicos = async () => {
+    limparErrosDadosBasicos();
 
+    const nome = nomeValue.value.trim();
     const email = emailValue.value.trim();
+    const emailAtualNormalizado = emailAtual.value.trim().toLowerCase();
+    const emailNormalizado = email.toLowerCase();
+    const nomeAtualNormalizado = nomeAtual.value.trim();
+    const nomeFoiAlterado = Boolean(nome && nome !== nomeAtualNormalizado);
+    const emailFoiAlterado = Boolean(email && emailNormalizado !== emailAtualNormalizado);
 
-    if (!email) {
-      emailError.value = 'Campo obrigatório';
+    if (nome && (nome.length < 3 || nome.length > 125)) {
+      nomeError.value = 'O nome deve ter entre 3 e 125 caracteres';
       return;
     }
 
-    if (!emailEhValido(email)) {
+    if (email && !emailEhValido(email)) {
       emailError.value = 'Campo inválido';
+      return;
+    }
+
+    if (!nomeFoiAlterado && !emailFoiAlterado) {
+      erro('Informe nome ou e-mail para alterar seus dados básicos.');
       return;
     }
 
@@ -203,18 +236,21 @@
       return;
     }
 
-    if (email === emailAtual.value) {
-      erro('O e-mail informado é igual ao e-mail atual.');
-      return;
-    }
-
     try {
-      salvandoEmail.value = true;
+      salvandoDadosBasicos.value = true;
 
-      const resposta = await atualizarDadosBasicosDaConta(api, {
+      const payload = {
         senhaAtual: senhaAtualEmail.value,
-        email,
-      });
+        ...(nomeFoiAlterado ? { nome } : {}),
+        ...(emailFoiAlterado ? { email } : {}),
+      };
+
+      const resposta = await atualizarDadosBasicosDaConta(api, payload);
+
+      if (resposta.dados?.nome) {
+        nomeAtual.value = resposta.dados.nome;
+        nomeValue.value = resposta.dados.nome;
+      }
 
       if (resposta.dados?.email) {
         emailAtual.value = resposta.dados.email;
@@ -222,7 +258,7 @@
       }
 
       senhaAtualEmail.value = '';
-      sucesso('E-mail atualizado com sucesso');
+      sucesso('Dados básicos atualizados com sucesso');
       tentarEmitirRelogin();
     } catch (err) {
       if (isAxiosError(err)) {
@@ -239,9 +275,9 @@
         }
       }
 
-      erro(obterErroDaRequisicao(err) || 'Não foi possível atualizar o e-mail da conta');
+      erro(obterErroDaRequisicao(err) || 'Não foi possível atualizar os dados básicos da conta');
     } finally {
-      salvandoEmail.value = false;
+      salvandoDadosBasicos.value = false;
     }
   };
 

@@ -4,11 +4,12 @@ import { AxiosInstance } from 'axios';
 
 type AtualizarDadosBasicosDaContaParametros = {
   senhaAtual: string;
+  nome?: string;
   email?: string;
   senhaNova?: string;
 };
 
-type AtualizarDadosBasicosDaContaResposta = Pick<Usuario, 'id' | 'email'>;
+type AtualizarDadosBasicosDaContaResposta = Pick<Usuario, 'id' | 'nome' | 'email'>;
 
 export default async function atualizarDadosBasicosDaConta(
   api: AxiosInstance,

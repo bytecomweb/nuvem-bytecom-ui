@@ -37,7 +37,12 @@
   });
 
   const propsComponente = computed(() => {
-    return { bearerToken: token.value, ehAdmin: ehAdmin.value, email: email.value };
+    return {
+      bearerToken: token.value,
+      ehAdmin: ehAdmin.value,
+      nome: nome.value,
+      email: email.value,
+    };
   });
 
   const token = computed(() => {
@@ -50,6 +55,10 @@
 
   const email = computed(() => {
     return localStorage.getItem('email') || undefined;
+  });
+
+  const nome = computed(() => {
+    return localStorage.getItem('nome') || undefined;
   });
 </script>
 

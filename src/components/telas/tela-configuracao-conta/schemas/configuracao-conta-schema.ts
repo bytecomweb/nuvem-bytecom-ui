@@ -3,26 +3,34 @@ import { z } from 'zod';
 
 export const configuracaoContaSchema = z
   .object({
+    nome: z.string().trim().min(3).max(125).optional().or(z.literal('')),
     email: z.string().trim().email(CAMPO_INVALIDO).optional().or(z.literal('')),
     senhaAtual: z.string().trim().min(1, CAMPO_OBRIGATORIO),
     senhaNova: z.string().optional().or(z.literal('')),
     confirmacaoSenhaNova: z.string().optional().or(z.literal('')),
   })
   .superRefine((dados, ctx) => {
+    const nome = dados.nome?.trim() || '';
     const email = dados.email?.trim() || '';
     const senhaNova = dados.senhaNova?.trim() || '';
     const confirmacaoSenhaNova = dados.confirmacaoSenhaNova?.trim() || '';
 
-    if (!email && !senhaNova) {
+    if (!nome && !email && !senhaNova) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Preencha novo e-mail ou nova senha',
+        message: 'Informe nome, e-mail ou nova senha para alterar',
+        path: ['nome'],
+      });
+
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Informe nome, e-mail ou nova senha para alterar',
         path: ['email'],
       });
 
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Preencha novo e-mail ou nova senha',
+        message: 'Informe nome, e-mail ou nova senha para alterar',
         path: ['senhaNova'],
       });
     }
