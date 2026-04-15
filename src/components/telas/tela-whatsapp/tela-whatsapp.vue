@@ -26,7 +26,9 @@
     <TelaWhatsappCardInstancia
       v-for="(instancia, idx) in instanciasTratadas"
       :instancia
-      :gerenciamento-restrito="instancia.podeGerenciar === false || instancia.ehInstanciaPadrao === true"
+      :gerenciamento-restrito="
+        instancia.podeGerenciar === false || instancia.ehInstanciaPadrao === true
+      "
       :key="idx"
       @apagar="() => confirmarApagarInstancia(instancia.name)"
       @configurar="instanciaParaConfigurar = instancia"

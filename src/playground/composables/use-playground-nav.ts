@@ -26,6 +26,12 @@ const TELAS_DISPONIVEIS: TelaDemo[] = [
     descricao: 'Tela de configuração de autenticação em duas etapas',
     grupo: 'Telas',
   },
+  {
+    id: 'tela-configuracao-conta',
+    titulo: 'Configuração de conta',
+    descricao: 'Tela para atualizar e-mail e senha da conta autenticada',
+    grupo: 'Telas',
+  },
 ];
 
 const telaSelecionada = ref<string | null>(null);

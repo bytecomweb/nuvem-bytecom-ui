@@ -107,11 +107,85 @@ const usuariosMock = [
 ];
 
 export function setupMockApi() {
+  const parseData = (data: unknown) => {
+    if (typeof data === 'string') {
+      try {
+        return JSON.parse(data);
+      } catch {
+        return {};
+      }
+    }
+
+    return data || {};
+  };
+
   // Interceptar requisições GET para /usuarios/empresas
   axios.interceptors.response.use(
     (response) => response,
     (error) => {
       const config = error.config;
+      const body = parseData(config.data) as {
+        nome?: string;
+        email?: string;
+        cnpjCpf?: string;
+        cargo?: 'ADMIN' | 'NORMAL' | 'GERENTE';
+        senhaAtual?: string;
+        senhaNova?: string;
+      };
+
+      if (config.url === '/api/v1' && config.method === 'get') {
+        return Promise.resolve({
+          status: 200,
+          data: {
+            status: 'ok',
+            autorizado: {
+              id: 8,
+              email: 'tomas153lm@gmail.com',
+              sistemas: ['Ótica', 'Ótica'],
+              cargo: 'ADMIN',
+              empresas: [
+                {
+                  id: 1,
+                  cnpj: '05063495000111',
+                  cargo: 'GERENTE',
+                },
+                {
+                  id: 2,
+                  cnpj: '72407711000196',
+                  cargo: 'GERENTE',
+                },
+              ],
+            },
+          },
+        });
+      }
+
+      if ((config.url === '/' || config.url === '') && config.method === 'get') {
+        return Promise.resolve({
+          status: 200,
+          data: {
+            status: 'ok',
+            autorizado: {
+              id: 8,
+              email: 'tomas153lm@gmail.com',
+              sistemas: ['Ótica', 'Ótica'],
+              cargo: 'ADMIN',
+              empresas: [
+                {
+                  id: 1,
+                  cnpj: '05063495000111',
+                  cargo: 'GERENTE',
+                },
+                {
+                  id: 2,
+                  cnpj: '72407711000196',
+                  cargo: 'GERENTE',
+                },
+              ],
+            },
+          },
+        });
+      }
 
       if (config.url === '/usuarios/empresas' && config.method === 'get') {
         return Promise.resolve({
@@ -170,10 +244,10 @@ export function setupMockApi() {
         const novoId = Math.max(...usuariosMock.map((u) => u.id), 0) + 1;
         usuariosMock.push({
           id: novoId,
-          nome: config.data.nome,
-          email: config.data.email,
-          cnpjCpf: config.data.cnpjCpf,
-          cargo: config.data.cargo,
+          nome: body.nome || 'Usuário sem nome',
+          email: body.email || `usuario${novoId}@example.com`,
+          cnpjCpf: body.cnpjCpf || '00000000000',
+          cargo: body.cargo || 'NORMAL',
           empresas: [],
           sistemas: [],
         });
@@ -187,11 +261,66 @@ export function setupMockApi() {
         const id = parseInt(config.url.split('/').pop());
         const usuario = usuariosMock.find((u) => u.id === id);
         if (usuario) {
-          Object.assign(usuario, config.data);
+          Object.assign(usuario, body);
         }
         return Promise.resolve({
           status: 200,
           data: { erro: false, mensagem: 'Usuário atualizado com sucesso' },
+        });
+      }
+
+      if (config.url === '/usuarios/me' && config.method === 'patch') {
+        if (!body.senhaAtual) {
+          return Promise.resolve({
+            status: 400,
+            data: { erro: true, mensagem: 'Senha atual é obrigatória' },
+          });
+        }
+
+        if (!body.email && !body.senhaNova) {
+          return Promise.resolve({
+            status: 400,
+            data: { erro: true, mensagem: 'Informe e-mail ou nova senha' },
+          });
+        }
+
+        if (body.senhaNova && body.senhaNova.length < 5) {
+          return Promise.resolve({
+            status: 400,
+            data: { erro: true, mensagem: 'Nova senha deve conter no mínimo 5 caracteres' },
+          });
+        }
+
+        if (body.senhaAtual !== '123456') {
+          return Promise.resolve({
+            status: 403,
+            data: { erro: true, mensagem: 'Senha atual incorreta' },
+          });
+        }
+
+        if (body.email === 'email-em-uso@teste.com') {
+          return Promise.resolve({
+            status: 409,
+            data: { erro: true, mensagem: 'E-mail já está em uso' },
+          });
+        }
+
+        const usuario = usuariosMock[0];
+
+        if (usuario && body.email) {
+          usuario.email = body.email;
+        }
+
+        return Promise.resolve({
+          status: 200,
+          data: {
+            erro: false,
+            mensagem: 'Dados básicos atualizados com sucesso',
+            dados: {
+              id: usuario?.id || 1,
+              email: usuario?.email || body.email || 'novo@email.com',
+            },
+          },
         });
       }
 

@@ -6,6 +6,7 @@ import Tooltip from 'primevue/tooltip';
 import type { App, Plugin } from 'vue';
 import TelaUsuarios from '@/components/telas/tela-usuarios/tela-usuarios.vue';
 import TelaWhatsApp from '@/components/telas/tela-whatsapp/tela-whatsapp.vue';
+import TelaConfiguracaoConta from '@/components/telas/tela-configuracao-conta/tela-configuracao-conta.vue';
 import {
   API_SERVICE_KEY,
   configureApiService,
@@ -22,9 +23,10 @@ const components = {
   TelaUsuarios,
   TelaWhatsApp,
   TelaConfiguracao2fa,
+  TelaConfiguracaoConta,
 };
 
-export { TelaUsuarios, TelaWhatsApp, TelaConfiguracao2fa };
+export { TelaUsuarios, TelaWhatsApp, TelaConfiguracao2fa, TelaConfiguracaoConta };
 export { API_SERVICE_KEY, configureApiService, createApiService, getApiService, useApiService };
 export type { ApiService, ApiServiceConfig, NuvemBytecomUiApiConfig };
 

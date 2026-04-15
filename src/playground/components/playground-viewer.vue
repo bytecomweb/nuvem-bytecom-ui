@@ -20,6 +20,7 @@
   import TelaUsuarios from '@/components/telas/tela-usuarios/tela-usuarios.vue';
   import TelaWhatsapp from '@/components/telas/tela-whatsapp/tela-whatsapp.vue';
   import TelaConfiguracao2fa from '@/components/telas/tela-configuracao-2fa/tela-configuracao-2fa.vue';
+  import TelaConfiguracaoConta from '@/components/telas/tela-configuracao-conta/tela-configuracao-conta.vue';
 
   const { telaAtual } = usePlaygroundNav();
 
@@ -27,6 +28,7 @@
     'tela-usuarios': TelaUsuarios,
     'tela-whatsapp': TelaWhatsapp,
     'tela-configuracao-2fa': TelaConfiguracao2fa,
+    'tela-configuracao-conta': TelaConfiguracaoConta,
   };
 
   const componenteAtual = computed(() => {
@@ -35,7 +37,7 @@
   });
 
   const propsComponente = computed(() => {
-    return { bearerToken: token.value, ehAdmin: ehAdmin.value };
+    return { bearerToken: token.value, ehAdmin: ehAdmin.value, email: email.value };
   });
 
   const token = computed(() => {
@@ -44,6 +46,10 @@
 
   const ehAdmin = computed(() => {
     return localStorage.getItem('ehAdmin') === 'true';
+  });
+
+  const email = computed(() => {
+    return localStorage.getItem('email') || undefined;
   });
 </script>
 
