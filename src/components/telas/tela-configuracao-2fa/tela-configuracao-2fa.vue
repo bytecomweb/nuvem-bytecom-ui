@@ -1,7 +1,7 @@
 <template>
   <TelaConfiguracao2faCabecalho />
-  <main class="px-4 mt-5 pb-10 space-y-4">
-    <div class="grid grid-cols-1 gap-3">
+  <main class="px-4 mt-5 pb-10 flex justify-center">
+    <div class="w-full max-w-2xl grid grid-cols-1 gap-3">
       <div class="border rounded-lg p-3 bg-white border-gray-200">
         <p class="text-xs text-gray-500">Formas ativas</p>
         <p class="text-lg font-semibold">{{ metodosAtivos }}</p>
