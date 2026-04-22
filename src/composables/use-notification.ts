@@ -29,9 +29,19 @@ export default function useNotification(notificacao: ToastServiceMethods = useTo
     });
   }
 
+  function info(mensagem: string, titulo = 'Informação') {
+    notificacao.add({
+      severity: 'info',
+      life: 2000,
+      summary: titulo,
+      detail: mensagem,
+    });
+  }
+
   return {
     sucesso,
     erro,
     aviso,
+    info
   };
 }

@@ -1,0 +1,1 @@
+export type TelaLoginMetodosDoisFatores = 'TOTP' | 'EMAIL' | 'WHATSAPP';
