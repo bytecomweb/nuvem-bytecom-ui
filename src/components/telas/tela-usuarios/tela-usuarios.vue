@@ -33,10 +33,6 @@
     :eh-admin
     @salvar="tentaSalvarUsuario"
   />
-
-  <ConfirmDialog />
-
-  <Toast />
 </template>
 
 <script setup lang="ts">
@@ -49,7 +45,6 @@
   import TelaUsuariosTabela from '@/components/telas/tela-usuarios/components/tela-usuarios-tabela.vue';
   import TelaUsuariosFormulario from '@/components/telas/tela-usuarios/components/tela-usuarios-formulario.vue';
   import { UsuarioCargo, Usuario } from '@/types/modelos/usuario';
-  import { ConfirmDialog, Toast } from 'primevue';
   import { Empresa } from '@/types/modelos/empresa';
   import { TelaUsuariosCampoFiltro } from '@/components/telas/tela-usuarios/types/tela-usuarios-campo-filtro';
   import obterEmpresas from '@/data/empresa/obter-empresas';

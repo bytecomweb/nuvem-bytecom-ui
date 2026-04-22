@@ -3,6 +3,7 @@
   import PlaygroundSidebar from './components/playground-sidebar.vue';
   import PlaygroundViewer from './components/playground-viewer.vue';
   import { setupMockApi } from './mocks/api-mock';
+  import { ConfirmDialog, Toast } from 'primevue';
 
   // Configurar mock de API
   onMounted(() => {
@@ -15,6 +16,8 @@
     <PlaygroundSidebar />
     <PlaygroundViewer />
   </div>
+  <Toast />
+  <ConfirmDialog />
 </template>
 
 <style>

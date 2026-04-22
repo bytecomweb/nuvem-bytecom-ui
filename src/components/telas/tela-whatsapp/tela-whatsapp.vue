@@ -58,8 +58,6 @@
     v-model:visivel="conectarInstanciaPadraoVisivel"
     :empresa-id="empresaSelecionada.id"
   />
-  <ConfirmDialog />
-  <Toast />
 </template>
 <script lang="ts" setup>
   import TelaWhatsappCabecalho from '@/components/telas/tela-whatsapp/components/tela-whatsapp-cabecalho.vue';
@@ -86,7 +84,7 @@
   import apenasNumeros from '@/utils/texto/apenas-numeros';
   import formatarTexto from '@/utils/texto/formatar-texto';
   import removerSimbolos from '@/utils/texto/remover-simbolos';
-  import { ConfirmDialog, Toast } from 'primevue';
+
   import { computed, onMounted, ref, watch } from 'vue';
   import { useConfirm } from 'primevue/useconfirm';
 

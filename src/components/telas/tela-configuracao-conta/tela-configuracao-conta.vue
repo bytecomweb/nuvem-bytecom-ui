@@ -112,8 +112,6 @@
       </div>
     </form>
   </Dialog>
-
-  <Toast />
 </template>
 
 <script lang="ts" setup>
