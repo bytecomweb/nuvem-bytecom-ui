@@ -197,6 +197,7 @@
       </section>
     </div>
   </main>
+  <TelaLoginModalRecuperarSenha v-model:visivel="modalRecuperarSenhaVisivel" :api />
 </template>
 <script lang="ts" setup>
   import { loginSchema } from '@/components/telas/tela-login/schemas/login-schema';
@@ -214,6 +215,7 @@
   import verificarLoginDoisFatores from '@/data/login/verificar-login-dois-fatores';
   import { TelaLoginDadosDoUsuario } from '@/components/telas/tela-login/types/tela-login-dados-do-usuario';
   import autenticar from '@/data/login/autenticar';
+  import TelaLoginModalRecuperarSenha from '@/components/telas/tela-login/components/tela-login-modal-recuperar-senha.vue';
 
   const api = useApi();
 
@@ -246,10 +248,9 @@
   const solicitandoDesafioDoisFatores = ref(false);
   const inputOtpRef = ref<{ $el?: HTMLElement } | null>(null);
   const confiarDispositivo = ref(true);
-  const modalRecuperacaoSenhaVisivel = ref(false);
+  const modalRecuperarSenhaVisivel = ref(false);
   const emailRecuperacaoSenha = ref('');
   const feedbackRecuperacaoSenha = ref('');
-  const carregandoRecuperacaoSenha = ref(false);
 
   const descricaoEtapaAtual = computed(() => {
     if (etapaLogin.value === 'METODO_2FA') {
@@ -448,7 +449,7 @@
   const abrirModalRecuperacaoSenha = () => {
     feedbackRecuperacaoSenha.value = '';
     emailRecuperacaoSenha.value = '';
-    modalRecuperacaoSenhaVisivel.value = true;
+    modalRecuperarSenhaVisivel.value = true;
   };
 
   const selecionarMetodoDoisFatores = (metodo: TelaLoginMetodosDoisFatores) => {
