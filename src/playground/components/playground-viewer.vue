@@ -21,6 +21,7 @@
   import TelaWhatsapp from '@/components/telas/tela-whatsapp/tela-whatsapp.vue';
   import TelaConfiguracao2fa from '@/components/telas/tela-configuracao-2fa/tela-configuracao-2fa.vue';
   import TelaConfiguracaoConta from '@/components/telas/tela-configuracao-conta/tela-configuracao-conta.vue';
+  import TelaLogin from '@/components/telas/tela-login/tela-login.vue';
 
   const { telaAtual } = usePlaygroundNav();
 
@@ -29,6 +30,7 @@
     'tela-whatsapp': TelaWhatsapp,
     'tela-configuracao-2fa': TelaConfiguracao2fa,
     'tela-configuracao-conta': TelaConfiguracaoConta,
+    'tela-login': TelaLogin,
   };
 
   const componenteAtual = computed(() => {
