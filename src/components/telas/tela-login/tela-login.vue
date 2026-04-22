@@ -145,7 +145,7 @@
                   v-model="codigoDoisFatores.valor"
                   :length="6"
                   integer-only
-                  class="mt-2 otp-login"
+                  class="mt-2 otp-login justify-center"
                 />
                 <div class="flex items-center gap-2 mt-3">
                   <Checkbox
@@ -166,7 +166,6 @@
                 </span>
               </div>
             </div>
-
             <div class="flex gap-2">
               <Button
                 v-if="etapaLogin !== 'CREDENCIAIS'"
@@ -209,10 +208,25 @@
   import { toTypedSchema } from '@vee-validate/zod';
   import { useForm } from 'vee-validate';
   import { computed, reactive, ref } from 'vue';
-  import solicitarDesafio2FA from '@/data/2fa/solicitar-desafio-2fa';
+
   import solicitarLogin2FADesafio from '@/data/2fa/solicitar-login-2fa-desafio';
+  import { Button, Checkbox, InputOtp, InputText, Password } from 'primevue';
+  import verificarLoginDoisFatores from '@/data/login/verificar-login-dois-fatores';
+  import { TelaLoginDadosDoUsuario } from '@/components/telas/tela-login/types/tela-login-dados-do-usuario';
+  import autenticar from '@/data/login/autenticar';
 
   const api = useApi();
+
+  const { tokenDispositivoConfiavel } = defineProps<{
+    tokenDispositivoConfiavel?: string;
+  }>();
+
+  const emit = defineEmits<{
+    'salvar:dados': [dados: TelaLoginDadosDoUsuario];
+    'salvar:dispositivo-confiavel': [token: string];
+    'remover:dispositivo-confiavel': [];
+    'ir:rota-inicial': [];
+  }>();
 
   const { defineField, handleSubmit, errors } = useForm({
     validationSchema: toTypedSchema(loginSchema),
@@ -266,6 +280,72 @@
   const tentaFazerLogin = handleSubmit(async ({ email, senha }) => {
     try {
       carregando.value = true;
+
+      if (etapaLogin.value === 'METODO_2FA') {
+        await solicitarDesafioDoisFatores();
+        return;
+      }
+
+      if (etapaLogin.value === 'CODIGO_2FA') {
+        if (!desafioDoisFatoresId.value) {
+          codigoDoisFatores.feedback = 'Solicite um desafio antes de validar o código';
+          return;
+        }
+
+        const codigoDoisFatoresLimpo = obterCodigoDoisFatoresLimpo();
+
+        if (!codigoDoisFatoresLimpo) {
+          codigoDoisFatores.feedback = 'Você deve informar o código';
+          return;
+        }
+
+        if (codigoDoisFatoresLimpo.length < 6) {
+          codigoDoisFatores.feedback = 'Informe os 6 dígitos do código';
+          return;
+        }
+
+        carregando.value = true;
+
+        const { dados } = await verificarLoginDoisFatores(
+          api,
+          tokenPreAutenticacao.value,
+          desafioDoisFatoresId.value,
+          codigoDoisFatores.valor,
+          confiarDispositivo.value
+        );
+
+        emit('salvar:dados', dados);
+
+        if (dados.tokenDispositivoConfiavel) {
+          emit('salvar:dispositivo-confiavel', dados.tokenDispositivoConfiavel);
+        } else {
+          emit('remover:dispositivo-confiavel');
+        }
+
+        emit('ir:rota-inicial');
+        return;
+      }
+
+      carregando.value = true;
+
+      const { dados } = await autenticar(api, email, senha, tokenDispositivoConfiavel);
+
+      if (dados.requerDoisFatores) {
+        aguardandoDoisFatores.value = true;
+        etapaLogin.value = 'METODO_2FA';
+        tokenPreAutenticacao.value = dados.tokenPreAutenticacao;
+        metodosDoisFatoresDisponiveis.value = dados.metodos;
+        metodoDoisFatoresSelecionado.value = null;
+        desafioDoisFatoresId.value = '';
+        desafioDoisFatoresExpiraEm.value = '';
+        codigoDoisFatores.valor = '';
+
+        info('Escolha o método e solicite o desafio para concluir o login', '2FA');
+        return;
+      }
+
+      emit('salvar:dados', dados);
+      emit('ir:rota-inicial');
     } catch (err) {
       erro(obterErroDaRequisicao(err) || 'Não foi possível fazer login');
     } finally {
@@ -412,5 +492,11 @@
     } finally {
       solicitandoDesafioDoisFatores.value = false;
     }
+  };
+
+  const obterCodigoDoisFatoresLimpo = () => {
+    return String(codigoDoisFatores.valor || '')
+      .replace(/\D/g, '')
+      .slice(0, 6);
   };
 </script>

@@ -10,11 +10,18 @@ type SolicitarLogin2FADesafioRetorno = {
   codigo?: string;
 };
 
-export default async function solicitarLogin2FADesafio(api: AxiosInstance, tokenPreAutenticacao: string, metodo: MetodoDoisFatores) {
-  const { data } = await api.post<RespostaSucesso<SolicitarLogin2FADesafioRetorno>>('/api/v1/entrar/2fa/desafios', {
-    tokenPreAutenticacao,
-    metodo
-  });
+export default async function solicitarLogin2FADesafio(
+  api: AxiosInstance,
+  tokenPreAutenticacao: string,
+  metodo: MetodoDoisFatores
+) {
+  const { data } = await api.post<RespostaSucesso<SolicitarLogin2FADesafioRetorno>>(
+    '/entrar/2fa/desafios',
+    {
+      tokenPreAutenticacao,
+      metodo,
+    }
+  );
 
   return data;
 }
