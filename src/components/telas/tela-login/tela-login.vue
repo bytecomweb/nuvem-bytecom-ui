@@ -1,22 +1,11 @@
 <template>
   <main
-    class="min-h-screen bg-gradient-to-br from-slate-100 via-gray-50 to-white flex items-center justify-center p-4"
+    class="min-h-screen bg-linear-to-br from-slate-100 via-gray-50 to-white flex items-center justify-center p-4"
   >
     <div
       class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 rounded-2xl overflow-hidden shadow-xl border border-slate-200 bg-white"
     >
-      <section class="hidden lg:flex flex-col justify-between bg-slate-900 text-white p-10">
-        <div>
-          <p class="text-xs uppercase tracking-[0.2em]">Nuvem Bytecom</p>
-          <p class="text-sm text-slate-300 mt-4">
-            Gerencie sistemas, usuários e comunicação com autenticação reforçada.
-          </p>
-        </div>
-        <div class="text-xs text-slate-400">
-          <p>Proteção por senha</p>
-        </div>
-      </section>
-
+      <TelaLoginSecaoInformacoes :titulo :descricao :rodape />
       <section class="p-6 md:p-10">
         <div class="max-w-md mx-auto">
           <h2 class="text-2xl font-semibold text-slate-900">Entrar</h2>
@@ -39,133 +28,31 @@
           </div>
 
           <form class="mt-7 space-y-5" @submit.prevent="tentaFazerLogin">
-            <div v-if="etapaLogin === 'CREDENCIAIS'">
-              <label for="email" class="text-sm text-slate-700">E-mail</label>
-              <InputText
-                id="email"
-                v-model="email"
-                v-bind="emailAttrs"
-                type="email"
-                inputmode="email"
-                autocomplete="email"
-                autocapitalize="off"
-                fluid
-                :invalid="!!errors.email"
-                :disabled="carregando"
-                class="mt-1"
-              />
-              <span v-if="errors.email" class="text-sm text-red-500 block mt-1">
-                {{ errors.email }}
-              </span>
-            </div>
+            <TelaLoginEtapaCredenciais
+              v-model:email="email"
+              v-model:senha="senha"
+              :email-error="errors.email"
+              :senha-error="errors.senha"
+              :email-attrs
+              :senha-attrs
+              :etapa-login
+              :carregando
+            />
+            <TelaLoginEtapaMetodo2fa
+              :etapa-login
+              :metodos-dois-fatores-disponiveis
+              :carregando="solicitandoDesafioDoisFatores"
+              :codigoDoisFatoresFeedback="codigoDoisFatores.feedback"
+              @selecionar-e-continuar="selecionarMetodoEContinuar"
+            />
+            <TelaLoginEtapaCodigo2fa
+              v-model:codigo-dois-fatores-valor="codigoDoisFatores.valor"
+              v-model:confiar-dispositivo="confiarDispositivo"
+              :etapa-login
+              :codigo-dois-fatores-feedback="codigoDoisFatores.feedback"
+              :metodo-dois-fatores-selecionado
+            />
 
-            <div v-if="etapaLogin === 'CREDENCIAIS'">
-              <label for="password" class="text-sm text-slate-700">Senha</label>
-              <Password
-                id="password"
-                v-model="senha"
-                v-bind="senhaAttrs"
-                toggle-mask
-                fluid
-                autocomplete="current-password"
-                :invalid="!!errors.senha"
-                :disabled="carregando"
-                :feedback="false"
-                class="mt-1"
-              />
-              <span v-if="errors.senha" class="text-sm text-red-500 block mt-1">
-                {{ errors.senha }}
-              </span>
-            </div>
-
-            <div
-              v-if="etapaLogin === 'METODO_2FA'"
-              class="rounded-xl border border-slate-200 bg-slate-50 p-4"
-            >
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <h3 class="text-sm font-semibold text-slate-800">Verificação em duas etapas</h3>
-                  <p class="text-xs text-slate-500 mt-1">
-                    Selecione o canal e vamos solicitar o desafio automaticamente
-                  </p>
-                </div>
-                <i class="pi pi-shield text-slate-500" />
-              </div>
-
-              <div class="mt-4">
-                <div class="grid grid-cols-3 gap-3">
-                  <button
-                    v-for="metodo in metodosDoisFatoresDisponiveis"
-                    :key="metodo"
-                    type="button"
-                    class="rounded-xl border border-slate-300 bg-white p-3 text-center transition-colors hover:border-slate-500"
-                    :disabled="solicitandoDesafioDoisFatores"
-                    @click="selecionarMetodoEContinuar(metodo)"
-                  >
-                    <i :class="`${obterIconeMetodoDoisFatores(metodo)} text-xl text-slate-700`" />
-                    <p class="text-[11px] text-slate-600 mt-2">
-                      {{ obterLabelCurtoMetodoDoisFatores(metodo) }}
-                    </p>
-                  </button>
-                </div>
-              </div>
-
-              <p v-if="solicitandoDesafioDoisFatores" class="text-xs text-slate-500 mt-3">
-                Solicitando desafio...
-              </p>
-
-              <span v-if="codigoDoisFatores.feedback" class="text-sm text-red-500 block mt-3">
-                {{ codigoDoisFatores.feedback }}
-              </span>
-            </div>
-
-            <div
-              v-if="etapaLogin === 'CODIGO_2FA'"
-              class="rounded-xl border border-slate-200 bg-slate-50 p-4"
-            >
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <h3 class="text-sm font-semibold text-slate-800">Digite o código 2FA</h3>
-                  <p class="text-xs text-slate-500 mt-1">
-                    Método:
-                    {{
-                      metodoDoisFatoresSelecionado
-                        ? obterLabelMetodoDoisFatores(metodoDoisFatoresSelecionado)
-                        : '-'
-                    }}
-                  </p>
-                </div>
-                <i class="pi pi-shield text-slate-500" />
-              </div>
-
-              <div class="mt-4">
-                <label class="text-sm text-slate-700">Código 2FA</label>
-                <InputOtp
-                  ref="inputOtpRef"
-                  v-model="codigoDoisFatores.valor"
-                  :length="6"
-                  integer-only
-                  class="mt-2 otp-login justify-center"
-                />
-                <div class="flex items-center gap-2 mt-3">
-                  <Checkbox
-                    v-model="confiarDispositivo"
-                    input-id="confiar-dispositivo"
-                    :binary="true"
-                  />
-                  <label for="confiar-dispositivo" class="text-xs text-slate-600 cursor-pointer">
-                    Não pedir código neste dispositivo por 30 dias
-                  </label>
-                </div>
-                <p v-if="desafioDoisFatoresExpiraEm" class="text-xs text-slate-500 mt-2">
-                  Desafio ativo até
-                  {{ new Date(desafioDoisFatoresExpiraEm).toLocaleTimeString() }}
-                </p>
-                <span v-if="codigoDoisFatores.feedback" class="text-sm text-red-500 block mt-2">
-                  {{ codigoDoisFatores.feedback }}
-                </span>
-              </div>
-            </div>
             <div class="flex gap-2">
               <Button
                 v-if="etapaLogin !== 'CREDENCIAIS'"
@@ -208,20 +95,32 @@
   import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
   import { toTypedSchema } from '@vee-validate/zod';
   import { useForm } from 'vee-validate';
-  import { computed, reactive, ref } from 'vue';
-
+  import { computed, reactive, ref, watch } from 'vue';
   import solicitarLogin2FADesafio from '@/data/2fa/solicitar-login-2fa-desafio';
-  import { Button, Checkbox, InputOtp, InputText, Password } from 'primevue';
+  import { Button } from 'primevue';
   import verificarLoginDoisFatores from '@/data/login/verificar-login-dois-fatores';
   import { TelaLoginDadosDoUsuario } from '@/components/telas/tela-login/types/tela-login-dados-do-usuario';
   import autenticar from '@/data/login/autenticar';
   import TelaLoginModalRecuperarSenha from '@/components/telas/tela-login/components/tela-login-modal-recuperar-senha.vue';
+  import TelaLoginSecaoInformacoes, {
+    TelaLoginSecaoInformacoesProps,
+  } from '@/components/telas/tela-login/components/tela-login-secao-informacoes.vue';
+  import TelaLoginEtapaCredenciais from '@/components/telas/tela-login/components/tela-login-etapa-credenciais.vue';
+  import TelaLoginEtapaCodigo2fa from '@/components/telas/tela-login/components/tela-login-etapa-codigo-2fa.vue';
+  import TelaLoginEtapaMetodo2fa from '@/components/telas/tela-login/components/tela-login-etapa-metodo-2fa.vue';
 
   const api = useApi();
 
-  const { tokenDispositivoConfiavel } = defineProps<{
-    tokenDispositivoConfiavel?: string;
-  }>();
+  const {
+    tokenDispositivoConfiavel,
+    titulo = 'Nuvem Bytecom',
+    descricao = 'Gerencie sistemas, usuários e comunicação com autenticação reforçada.',
+    rodape = 'Proteção por senha',
+  } = defineProps<
+    {
+      tokenDispositivoConfiavel?: string;
+    } & TelaLoginSecaoInformacoesProps
+  >();
 
   const emit = defineEmits<{
     'salvar:dados': [dados: TelaLoginDadosDoUsuario];
@@ -246,7 +145,6 @@
   const desafioDoisFatoresId = ref('');
   const desafioDoisFatoresExpiraEm = ref('');
   const solicitandoDesafioDoisFatores = ref(false);
-  const inputOtpRef = ref<{ $el?: HTMLElement } | null>(null);
   const confiarDispositivo = ref(true);
   const modalRecuperarSenhaVisivel = ref(false);
   const emailRecuperacaoSenha = ref('');
@@ -359,58 +257,10 @@
     await solicitarDesafioDoisFatores();
   };
 
-  const obterIconeMetodoDoisFatores = (metodo: TelaLoginMetodosDoisFatores) => {
-    if (metodo === 'TOTP') {
-      return 'pi pi-shield';
-    }
-
-    if (metodo === 'EMAIL') {
-      return 'pi pi-envelope';
-    }
-
-    if (metodo === 'WHATSAPP') {
-      return 'pi pi-whatsapp';
-    }
-
-    return 'pi pi-question-circle';
-  };
-
-  const obterLabelCurtoMetodoDoisFatores = (metodo: TelaLoginMetodosDoisFatores) => {
-    if (metodo === 'TOTP') {
-      return 'Autenticador';
-    }
-
-    if (metodo === 'EMAIL') {
-      return 'E-mail';
-    }
-
-    if (metodo === 'WHATSAPP') {
-      return 'WhatsApp';
-    }
-
-    return '-';
-  };
-
   const codigoDoisFatores = reactive({
     valor: '',
     feedback: '',
   });
-
-  const obterLabelMetodoDoisFatores = (metodo: TelaLoginMetodosDoisFatores) => {
-    if (metodo === 'TOTP') {
-      return 'Aplicativo autenticador (TOTP)';
-    }
-
-    if (metodo === 'EMAIL') {
-      return 'Código por e-mail';
-    }
-
-    if (metodo === 'WHATSAPP') {
-      return 'Código por WhatsApp';
-    }
-
-    return '-';
-  };
 
   const voltarEtapa = () => {
     codigoDoisFatores.feedback = '';
@@ -500,4 +350,24 @@
       .replace(/\D/g, '')
       .slice(0, 6);
   };
+
+  watch(
+    () => codigoDoisFatores.valor,
+    (valorAtual, valorAnterior) => {
+      if (etapaLogin.value !== 'CODIGO_2FA' || carregando.value || !desafioDoisFatoresId.value) {
+        return;
+      }
+
+      const codigoAtual = String(valorAtual || '')
+        .replace(/\D/g, '')
+        .slice(0, 6);
+      const codigoAnterior = String(valorAnterior || '')
+        .replace(/\D/g, '')
+        .slice(0, 6);
+
+      if (codigoAtual.length === 6 && codigoAnterior.length < 6) {
+        tentaFazerLogin();
+      }
+    }
+  );
 </script>
