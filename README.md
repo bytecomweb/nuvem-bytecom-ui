@@ -10,8 +10,8 @@ Base de um package de UI em Vue 3 com TypeScript, Vite e PrimeVue.
 
 ## Estrutura
 
-- `src/components`: componentes reutilizaveis
-- `src/index.ts`: exports publicos da biblioteca
+- `src/components`: componentes reutilizáveis
+- `src/index.ts`: exports públicos da biblioteca
 - `src/playground`: app local para testar os componentes durante o desenvolvimento
 
 ## Stack
@@ -25,29 +25,29 @@ Base de um package de UI em Vue 3 com TypeScript, Vite e PrimeVue.
 ## Uso
 
 ```ts
-import { createApp } from "vue";
-import App from "./App.vue";
-import NuvemBytecomUi from "@nuvem-bytecom/ui";
-import "@nuvem-bytecom/ui/style.css";
+import { createApp } from 'vue';
+import App from './App.vue';
+import NuvemBytecomUi from '@nuvem-bytecom/ui';
+import '@nuvem-bytecom/ui/style.css';
 
 createApp(App)
   .use(NuvemBytecomUi, {
     api: {
       baseURL: import.meta.env.VITE_API_URL,
-      prefix: "api/v1",
-      bearerToken: "seu-token-aqui",
+      prefix: 'api/v1',
+      bearerToken: 'seu-token-aqui',
     },
   })
-  .mount("#app");
+  .mount('#app');
 ```
 
 Ou com import pontual:
 
 ```ts
-import { UiButton } from "@nuvem-bytecom/ui";
+import { UiButton } from '@nuvem-bytecom/ui';
 ```
 
-Para a tela de usuarios, voce tambem pode passar o token diretamente no componente:
+Para a tela de usuários, você também pode passar o token diretamente no componente:
 
 ```vue
 <template>
@@ -55,36 +55,36 @@ Para a tela de usuarios, voce tambem pode passar o token diretamente no componen
 </template>
 
 <script setup lang="ts">
-import { TelaUsuarios } from "@nuvem-bytecom/ui";
+  import { TelaUsuarios } from '@nuvem-bytecom/ui';
 
-const token = "seu-token-aqui";
+  const token = 'seu-token-aqui';
 </script>
 ```
 
 ## API Service
 
-Cada projeto que consumir a lib pode configurar sua propria URL base e prefixo da API no momento da instalacao do plugin.
+Cada projeto que consumir a lib pode configurar sua propria URL base e prefixo da API no momento da instalação do plugin.
 
 ```ts
 createApp(App)
   .use(NuvemBytecomUi, {
     api: {
-      baseURL: "https://meu-backend.com",
-      prefix: "api/admin",
-      bearerToken: "seu-token-aqui",
+      baseURL: 'https://meu-backend.com',
+      prefix: 'api/admin',
+      bearerToken: 'seu-token-aqui',
       axios: {
         timeout: 10000,
       },
     },
   })
-  .mount("#app");
+  .mount('#app');
 ```
 
 Quando `bearerToken` for informado, o client adiciona automaticamente o header:
 
 - `Authorization: Bearer <token>`
 
-O `baseURL` final do client vira a composicao de `baseURL + prefix`.
+O `baseURL` final do client vira a composição de `baseURL + prefix`.
 
 Exemplo:
 
@@ -95,27 +95,34 @@ Exemplo:
 Para usar o client configurado:
 
 ```ts
-import { useApiService } from "@nuvem-bytecom/ui";
+import { useApiService } from '@nuvem-bytecom/ui';
 
 const api = useApiService();
 
-await api.instance.get("/usuarios");
+await api.instance.get('/usuários');
 ```
 
-Fora do contexto de `setup()`, voce pode usar o helper exportado:
+Fora do contexto de `setup()`, você pode usar o helper exportado:
 
 ```ts
-import { getApiService } from "@nuvem-bytecom/ui";
+import { getApiService } from '@nuvem-bytecom/ui';
 
-await getApiService().instance.get("/usuarios");
+await getApiService().instance.get('/usuários');
 ```
 
-Se a aplicacao hospedeira ja instalar o PrimeVue manualmente, desabilite a instalacao automatica do plugin:
+Se a aplicação hospedeira ja instalar o PrimeVue manualmente, desabilite a instalação automática do plugin:
 
 ```ts
 createApp(App)
   .use(NuvemBytecomUi, {
     installPrimeVue: false,
   })
-  .mount("#app");
+  .mount('#app');
+```
+
+Lembrar de adicionar a estilização no arquivo de CSS global
+
+```css
+@source '../../../node_modules/@nuvem-bytecom/ui';
+@source '../../../node_modules/@nuvem-bytecom/ui/dist';
 ```
