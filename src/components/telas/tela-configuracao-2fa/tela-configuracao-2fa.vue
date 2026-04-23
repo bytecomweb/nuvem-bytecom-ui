@@ -1,5 +1,5 @@
 <template>
-  <TelaConfiguracao2faCabecalho />
+  <TelaConfiguracao2faCabecalho v-if="!esconderCabecalho" />
   <main class="px-4 mt-5 pb-10 flex justify-center">
     <div class="w-full max-w-2xl grid grid-cols-1 gap-3">
       <div class="border rounded-lg p-3 bg-white border-gray-200">
@@ -160,7 +160,7 @@
   import { Metodo2FA } from '@/types/modelos/metodo-2fa';
   import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
   import { MaskInputOptions } from 'maska';
-  import { Button, InputText, Tag, Toast, ToggleSwitch } from 'primevue';
+  import { Button, InputText, Tag, ToggleSwitch } from 'primevue';
   import { computed, onMounted, ref } from 'vue';
   import { toDataURL } from 'qrcode';
   import configurarTotp from '@/data/2fa/configurar-totp';
@@ -174,6 +174,7 @@
   const { bearerToken } = defineProps<{
     bearerToken: string;
     ehAdmin?: boolean;
+    esconderCabecalho?: boolean;
   }>();
 
   const api = useApi(bearerToken);

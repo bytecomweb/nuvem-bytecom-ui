@@ -1,5 +1,5 @@
 <template>
-  <TelaConfiguracaoContaCabecalho />
+  <TelaConfiguracaoContaCabecalho v-if="!esconderCabecalho" />
 
   <main class="px-4 mt-5 pb-10 flex justify-center">
     <section
@@ -116,7 +116,7 @@
 
 <script lang="ts" setup>
   import { isAxiosError } from 'axios';
-  import { Button, Dialog, InputText, Password, Toast } from 'primevue';
+  import { Button, Dialog, InputText, Password } from 'primevue';
   import { onMounted, ref } from 'vue';
   import Label from '@/components/label.vue';
   import TelaConfiguracaoContaCabecalho from '@/components/telas/tela-configuracao-conta/components/tela-configuracao-conta-cabecalho.vue';
@@ -131,6 +131,7 @@
     ehAdmin?: boolean;
     nome?: string;
     email?: string;
+    esconderCabecalho?: boolean;
   }>();
 
   const emit = defineEmits<{
