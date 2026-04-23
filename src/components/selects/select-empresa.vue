@@ -33,12 +33,13 @@
     required: true,
   });
 
-  const { selecionarPrimeiroAutomaticamente } = defineProps<{
+  const { selecionarPrimeiroAutomaticamente, bearerToken } = defineProps<{
     selecionarPrimeiroAutomaticamente?: boolean;
     filtro?: boolean;
+    bearerToken?: string;
   }>();
 
-  const api = useApi();
+  const api = useApi(bearerToken);
 
   const select = useTemplateRef('select');
 
