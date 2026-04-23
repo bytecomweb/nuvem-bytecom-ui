@@ -23,17 +23,6 @@ import CheckboxComLabel from '@/components/inputs/checkbox-com-label.vue';
 import InputMask from '@/components/inputs/input-mask.vue';
 import SelectEmpresa from '@/components/selects/select-empresa.vue';
 
-const components = {
-  TelaUsuarios,
-  TelaWhatsApp,
-  TelaConfiguracao2fa,
-  TelaConfiguracaoConta,
-  TelaLogin,
-  CheckboxComLabel,
-  InputMask,
-  SelectEmpresa,
-};
-
 export {
   TelaUsuarios,
   TelaWhatsApp,
@@ -76,9 +65,5 @@ export default {
     }
 
     app.provide(API_SERVICE_KEY, apiService);
-
-    for (const [name, component] of Object.entries(components)) {
-      app.component(name, component);
-    }
   },
 } satisfies Plugin;
