@@ -19,6 +19,9 @@ import {
 } from './services/api';
 import TelaConfiguracao2fa from '@/components/telas/tela-configuracao-2fa/tela-configuracao-2fa.vue';
 import TelaLogin from '@/components/telas/tela-login/tela-login.vue';
+import CheckboxComLabel from '@/components/inputs/checkbox-com-label.vue';
+import InputMask from '@/components/inputs/input-mask.vue';
+import SelectEmpresa from '@/components/selects/select-empresa.vue';
 
 const components = {
   TelaUsuarios,
@@ -26,9 +29,21 @@ const components = {
   TelaConfiguracao2fa,
   TelaConfiguracaoConta,
   TelaLogin,
+  CheckboxComLabel,
+  InputMask,
+  SelectEmpresa,
 };
 
-export { TelaUsuarios, TelaWhatsApp, TelaConfiguracao2fa, TelaConfiguracaoConta, TelaLogin };
+export {
+  TelaUsuarios,
+  TelaWhatsApp,
+  TelaConfiguracao2fa,
+  TelaConfiguracaoConta,
+  TelaLogin,
+  CheckboxComLabel,
+  InputMask,
+  SelectEmpresa,
+};
 export { API_SERVICE_KEY, configureApiService, createApiService, getApiService, useApiService };
 export type { ApiService, ApiServiceConfig, NuvemBytecomUiApiConfig };
 
