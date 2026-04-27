@@ -7,6 +7,14 @@
     >
       <TelaLoginSecaoInformacoes :titulo :descricao :rodape />
       <section class="p-6 md:p-10">
+        <button
+          class="mb-3 flex items-center gap-2 text-sm text-gray-400 cursor-pointer hover:text-black transition-all"
+          v-if="voltarVisivel"
+          @click="emit('voltar')"
+        >
+          <span class="pi pi-arrow-left" />
+          <p>{{ labelVoltar }}</p>
+        </button>
         <div class="max-w-md mx-auto">
           <h2 class="text-2xl font-semibold text-slate-900">Entrar</h2>
           <p class="text-sm text-slate-500 mt-1">
@@ -116,9 +124,12 @@
     titulo = 'Nuvem Bytecom',
     descricao = 'Gerencie sistemas, usuários e comunicação com autenticação reforçada.',
     rodape = 'Proteção por senha',
+    labelVoltar = 'Voltar para tela inicial',
   } = defineProps<
     {
       tokenDispositivoConfiavel?: string;
+      labelVoltar?: string;
+      voltarVisivel?: boolean;
     } & TelaLoginSecaoInformacoesProps
   >();
 
@@ -127,6 +138,7 @@
     'salvar:dispositivo-confiavel': [token: string];
     'remover:dispositivo-confiavel': [];
     'ir:rota-inicial': [];
+    voltar: [];
   }>();
 
   const { defineField, handleSubmit, errors } = useForm({
