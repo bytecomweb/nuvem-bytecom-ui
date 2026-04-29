@@ -4,6 +4,7 @@
     <TelaPessoasFiltro
       v-model:busca="filtros.busca"
       v-model:campos-para-buscar="filtros.camposParaBuscar"
+      @buscar="tentaObterPessoas"
     />
     <div>
       <TelaPessoasTabela
@@ -16,10 +17,12 @@
       />
     </div>
   </main>
+  <TelaPessoasModalRedefinicaoSenha v-model:link="linkRedefinicao" />
 </template>
 <script lang="ts" setup>
   import TelaPessoasCabecalho from '@/components/telas/tela-pessoas/components/tela-pessoas-cabecalho.vue';
   import TelaPessoasFiltro from '@/components/telas/tela-pessoas/components/tela-pessoas-filtro.vue';
+  import TelaPessoasModalRedefinicaoSenha from '@/components/telas/tela-pessoas/components/tela-pessoas-modal-redefinicao-senha.vue';
   import TelaPessoasTabela from '@/components/telas/tela-pessoas/components/tela-pessoas-tabela.vue';
   import { TelaPessoasFiltros } from '@/components/telas/tela-pessoas/types/tela-pessoas-filtros';
   import useApi from '@/composables/use-api';

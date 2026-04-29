@@ -34,7 +34,7 @@
           type="button"
           aria-label="Buscar"
           class="h-11! w-11! p-0! shrink-0"
-          @click="busca = buscaInterna"
+          @click="emit('buscar')"
         />
       </div>
     </div>
@@ -50,6 +50,8 @@
   const busca = defineModel<string>('busca', {
     required: true,
   });
+
+  const emit = defineEmits(['buscar']);
 
   const buscaInterna = ref<string>('');
 
