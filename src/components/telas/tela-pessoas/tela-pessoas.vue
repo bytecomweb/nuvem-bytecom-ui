@@ -1,6 +1,10 @@
 <template>
   <TelaPessoasCabecalho :titulo :cadastrar-label v-model:empresa-selecionada="empresaSelecionada" />
-  <main class="px-5 mt-5">
+  <main class="px-5 mt-8 flex flex-col gap-8">
+    <TelaPessoasFiltro
+      v-model:busca="filtros.busca"
+      v-model:campos-para-buscar="filtros.camposParaBuscar"
+    />
     <div>
       <TelaPessoasTabela
         :pessoas
@@ -8,16 +12,20 @@
         :total="paginacao.total"
         v-model:pagina="paginacao.pagina"
         v-model:tamanho-pagina="paginacao.tamanho"
+        @redefinir-senha="tentaRedefinirSenha"
       />
     </div>
   </main>
 </template>
 <script lang="ts" setup>
   import TelaPessoasCabecalho from '@/components/telas/tela-pessoas/components/tela-pessoas-cabecalho.vue';
+  import TelaPessoasFiltro from '@/components/telas/tela-pessoas/components/tela-pessoas-filtro.vue';
   import TelaPessoasTabela from '@/components/telas/tela-pessoas/components/tela-pessoas-tabela.vue';
+  import { TelaPessoasFiltros } from '@/components/telas/tela-pessoas/types/tela-pessoas-filtros';
   import useApi from '@/composables/use-api';
   import useNotification from '@/composables/use-notification';
   import obterPessoas from '@/data/pessoa/obter-pessoas';
+  import redefinirSenhaPorPessoaId from '@/data/pessoa/redefinir-senha-por-pessoa-id';
   import { Empresa } from '@/types/modelos/empresa';
   import { Pessoa } from '@/types/modelos/pessoa';
   import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
@@ -50,6 +58,10 @@
     tamanho: 50,
     total: 1,
   });
+  const filtros = reactive<TelaPessoasFiltros>({
+    busca: '',
+    camposParaBuscar: 'todos',
+  });
 
   const tentaObterPessoas = async () => {
     try {
@@ -63,7 +75,9 @@
         api,
         empresaSelecionada.value.id,
         {
+          busca: filtros.busca,
           ...paginacao,
+          campoParaBuscar: filtros.camposParaBuscar,
         }
       );
 
@@ -77,11 +91,23 @@
     }
   };
 
-  watch([empresaSelecionada, () => paginacao.pagina, () => paginacao.tamanho], () => {
+  watch([empresaSelecionada, () => paginacao.pagina, () => paginacao.tamanho, filtros], () => {
     tentaObterPessoas();
   });
 
-  watch(empresaSelecionada, () => {
+  watch([empresaSelecionada, filtros], () => {
     paginacao.pagina = 1;
   });
+
+  const linkRedefinicao = ref<string>();
+
+  const tentaRedefinirSenha = async (pessoaId: number) => {
+    try {
+      const { dados } = await redefinirSenhaPorPessoaId(api, pessoaId);
+
+      linkRedefinicao.value = dados.link;
+    } catch (err) {
+      erro(obterErroDaRequisicao(err) || 'Não foi possível redefinir a senha');
+    }
+  };
 </script>

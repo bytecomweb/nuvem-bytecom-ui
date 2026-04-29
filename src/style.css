@@ -1,1 +1,6 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+:root {
+  --p-datatable-body-cell-padding: 6px !important;
+  --p-datatable-header-cell-padding: 6px !important;
+}
