@@ -5,6 +5,7 @@ import { AxiosInstance } from 'axios';
 export type ObterPessoasExtraProps = {
   pagina?: number;
   busca?: string;
+  tamanho?: number;
 };
 
 export default async function obterPessoas(
@@ -17,6 +18,7 @@ export default async function obterPessoas(
       empresaId,
       todos: extraProps?.busca || undefined,
       pagina: extraProps?.pagina,
+      tamanhoPagina: extraProps?.tamanho,
     },
   });
 
