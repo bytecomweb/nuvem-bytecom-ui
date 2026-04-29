@@ -1,7 +1,8 @@
+import { TelasExistentes } from '@/playground/types/telas-existentes';
 import { ref, computed } from 'vue';
 
 export type TelaDemo = {
-  id: string;
+  id: TelasExistentes;
   titulo: string;
   descricao: string;
   grupo: string;
@@ -36,6 +37,12 @@ const TELAS_DISPONIVEIS: TelaDemo[] = [
     id: 'tela-login',
     titulo: 'Tela de login',
     descricao: 'Tela de login com 2FA',
+    grupo: 'Telas',
+  },
+  {
+    id: 'tela-pessoas',
+    titulo: 'Tela de pessoas',
+    descricao: 'Tela de pessoas',
     grupo: 'Telas',
   },
 ];

@@ -5,7 +5,7 @@
       <p>{{ telaAtual?.descricao }}</p>
     </div>
 
-    <div class="viewer-content" :id="componenteAtual">
+    <div class="viewer-content" :id="telaAtual?.id">
       <component :is="componenteAtual" v-if="componenteAtual" v-bind="propsComponente" />
       <div v-else class="empty-state">
         <p>Selecione uma tela no menu lateral para começar</p>
@@ -15,22 +15,25 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { type Component, computed } from 'vue';
   import { usePlaygroundNav } from '../composables/use-playground-nav';
   import TelaUsuarios from '@/components/telas/tela-usuarios/tela-usuarios.vue';
   import TelaWhatsapp from '@/components/telas/tela-whatsapp/tela-whatsapp.vue';
   import TelaConfiguracao2fa from '@/components/telas/tela-configuracao-2fa/tela-configuracao-2fa.vue';
   import TelaConfiguracaoConta from '@/components/telas/tela-configuracao-conta/tela-configuracao-conta.vue';
   import TelaLogin from '@/components/telas/tela-login/tela-login.vue';
+  import TelaPessoas from '@/components/telas/tela-pessoas/tela-pessoas.vue';
+  import { TelasExistentes } from '@/playground/types/telas-existentes';
 
   const { telaAtual } = usePlaygroundNav();
 
-  const componentesMap: Record<string, any> = {
+  const componentesMap: Record<TelasExistentes, Component> = {
     'tela-usuarios': TelaUsuarios,
     'tela-whatsapp': TelaWhatsapp,
     'tela-configuracao-2fa': TelaConfiguracao2fa,
     'tela-configuracao-conta': TelaConfiguracaoConta,
     'tela-login': TelaLogin,
+    'tela-pessoas': TelaPessoas,
   };
 
   const componenteAtual = computed(() => {
