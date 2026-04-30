@@ -1,6 +1,6 @@
 <template>
   <div>
-    <FloatLabel variant="on">
+    <FloatLabel :variant="variant || 'on'">
       <slot />
       <label>{{ label }}</label>
     </FloatLabel>
@@ -10,10 +10,11 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { FloatLabel, Message } from 'primevue';
+import { FloatLabel, FloatLabelProps, Message } from 'primevue';
 
-  defineProps<{
-    label: string;
-    feedback?: string;
-  }>();
+defineProps<{
+  label: string;
+  feedback?: string;
+  variant?: FloatLabelProps['variant'];
+}>();
 </script>

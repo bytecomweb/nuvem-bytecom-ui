@@ -71,20 +71,14 @@
     para-adicionar-key="empresasParaAdicionar"
     para-remover-key="empresasParaRemover"
   />
-  <TelaPessoasModalEnderecosFormulario
-    v-model:visivel="modalEnderecosFormularioVisivel"
-    :errors
-    :set-field-error="
-      setFieldError as (campo: string, mensagem: string | string[] | undefined) => void
-    "
-  />
+  <TelaPessoasModalEnderecos v-model:visivel="modalEnderecosFormularioVisivel" :errors />
 </template>
 <script lang="ts" setup>
 import InputCpfOuCnpj from '@/components/inputs/input-cpf-ou-cnpj.vue';
 import InputTelefone from '@/components/inputs/input-telefone.vue';
 import Label from '@/components/label.vue';
 import ModalEmpresasFormulario from '@/components/modals/modal-empresas-formulario.vue';
-import TelaPessoasModalEnderecosFormulario from '@/components/telas/tela-pessoas/components/tela-pessoas-modal-enderecos-formulario.vue';
+import TelaPessoasModalEnderecos from '@/components/telas/tela-pessoas/components/tela-pessoas-modal-enderecos.vue';
 import { pessoaFormularioSchema } from '@/components/telas/tela-pessoas/schemas/pessoa-formulario-schema';
 import useNotification from '@/composables/use-notification';
 import { Empresa } from '@/types/modelos/empresa';
@@ -100,7 +94,7 @@ const visivel = defineModel<boolean>('visivel', {
   required: true,
 });
 
-const { defineField, resetForm, errors, handleSubmit, setFieldError } = useForm({
+const { defineField, resetForm, errors, handleSubmit } = useForm({
   validationSchema: toTypedSchema(pessoaFormularioSchema),
   initialValues: {
     empresasParaAdicionar: [],

@@ -8,6 +8,7 @@ import TelaUsuarios from '@/components/telas/tela-usuarios/tela-usuarios.vue';
 import TelaWhatsApp from '@/components/telas/tela-whatsapp/tela-whatsapp.vue';
 import TelaConfiguracaoConta from '@/components/telas/tela-configuracao-conta/tela-configuracao-conta.vue';
 import TelaPessoas from '@/components/telas/tela-pessoas/tela-pessoas.vue';
+import KeyFilter from 'primevue/keyfilter';
 import {
   API_SERVICE_KEY,
   configureApiService,
@@ -80,6 +81,8 @@ export default {
 
       app.use(ConfirmationService);
       app.use(ToastService);
+
+      app.directive('keyfilter', KeyFilter);
       app.directive('tooltip', Tooltip);
     }
 
