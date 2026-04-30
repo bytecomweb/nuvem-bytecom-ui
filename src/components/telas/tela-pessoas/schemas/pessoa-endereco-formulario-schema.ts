@@ -3,6 +3,7 @@ import { CAMPO_INVALIDO, CAMPO_OBRIGATORIO } from '@/utils/constantes/feedback';
 import z from 'zod';
 
 export const pessoaEnderecoFormularioSchema = z.object({
+  id: z.number().optional(),
   tipo: z.enum(['PRINCIPAL', 'COBRANCA', 'ENTREGA', 'OUTROS']),
   logradouro: z
     .string({
