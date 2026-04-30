@@ -80,7 +80,9 @@ import Label from '@/components/label.vue';
 import ModalEmpresasFormulario from '@/components/modals/modal-empresas-formulario.vue';
 import TelaPessoasModalEnderecos from '@/components/telas/tela-pessoas/components/tela-pessoas-modal-enderecos.vue';
 import { pessoaFormularioSchema } from '@/components/telas/tela-pessoas/schemas/pessoa-formulario-schema';
+import useApi from '@/composables/use-api';
 import useNotification from '@/composables/use-notification';
+import cadastrarPessoa from '@/data/pessoa/cadastrar-pessoa';
 import { Empresa } from '@/types/modelos/empresa';
 import { Pessoa } from '@/types/modelos/pessoa';
 import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
@@ -123,7 +125,9 @@ watch(visivel, () => {
   });
 });
 
-const { erro } = useNotification();
+const { erro, sucesso } = useNotification();
+
+const api = useApi();
 
 const tentaSalvar = handleSubmit(async (dados) => {
   try {
@@ -144,6 +148,15 @@ const tentaSalvar = handleSubmit(async (dados) => {
     if (enderecosPrincipais.length > 1) {
       return erro('A pessoa não pode possuir mais de um endereço principal');
     }
+
+    dados.cpfCnpj = apenasNumeros(dados.cpfCnpj);
+    dados.telefone = dados.telefone ? apenasNumeros(dados.telefone) : dados.telefone;
+
+    await cadastrarPessoa(api, dados);
+
+    visivel.value = false;
+
+    sucesso('Pessoa cadastrada com sucesso');
   } catch (err) {
     erro(obterErroDaRequisicao(err) || 'Não foi possível realizar a operação');
   }
