@@ -24,8 +24,10 @@
   </main>
   <TelaPessoasModalRedefinicaoSenha v-model:link="linkRedefinicao" />
   <TelaPessoasModalFormulario
+    v-if="empresaSelecionada"
     v-model:visivel="modalFormulario.visivel"
     :pessoa="modalFormulario.pessoa"
+    :empresa-selecionada
   />
 </template>
 <script lang="ts" setup>

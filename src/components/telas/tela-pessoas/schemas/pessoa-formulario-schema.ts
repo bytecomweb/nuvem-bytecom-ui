@@ -27,6 +27,7 @@ export const pessoaFormularioSchema = z.object({
       message: CAMPO_INVALIDO,
     }),
   telefone: z.string().optional(),
-  empresas: z.array(empresaSchema),
+  empresasParaAdicionar: z.array(empresaSchema),
+  empresasParaRemover: z.array(empresaSchema),
   enderecos: z.array(pessoaEnderecoFormularioSchema),
 });

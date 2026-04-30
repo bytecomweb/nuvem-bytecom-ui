@@ -46,23 +46,42 @@
       </Label>
     </div>
     <template #footer>
-      <Button label="Salvar" @click="tentaSalvar" />
+      <div class="flex justify-between items-center w-full">
+        <div>
+          <Button
+            label="Empresas"
+            @click="modalEmpresasFormularioVisivel = true"
+            severity="secondary"
+          />
+        </div>
+        <div>
+          <Button label="Salvar" @click="tentaSalvar" />
+        </div>
+      </div>
     </template>
   </Dialog>
+  <ModalEmpresasFormulario
+    v-model:visivel="modalEmpresasFormularioVisivel"
+    titulo="Empresas da pessoa"
+    para-adicionar-key="empresasParaAdicionar"
+    para-remover-key="empresasParaRemover"
+  />
 </template>
 <script lang="ts" setup>
 import InputCpfOuCnpj from '@/components/inputs/input-cpf-ou-cnpj.vue';
 import InputTelefone from '@/components/inputs/input-telefone.vue';
 import Label from '@/components/label.vue';
+import ModalEmpresasFormulario from '@/components/modals/modal-empresas-formulario.vue';
 import { pessoaFormularioSchema } from '@/components/telas/tela-pessoas/schemas/pessoa-formulario-schema';
 import useNotification from '@/composables/use-notification';
+import { Empresa } from '@/types/modelos/empresa';
 import { Pessoa } from '@/types/modelos/pessoa';
 import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
 import apenasNumeros from '@/utils/texto/apenas-numeros';
 import { toTypedSchema } from '@vee-validate/zod';
 import { Button, Dialog, InputText } from 'primevue';
 import { useForm } from 'vee-validate';
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const visivel = defineModel<boolean>('visivel', {
   required: true,
@@ -71,13 +90,15 @@ const visivel = defineModel<boolean>('visivel', {
 const { defineField, resetForm, errors, handleSubmit } = useForm({
   validationSchema: toTypedSchema(pessoaFormularioSchema),
   initialValues: {
-    empresas: [],
+    empresasParaAdicionar: [],
+    empresasParaRemover: [],
     enderecos: [],
   },
 });
 
-defineProps<{
+const { empresaSelecionada, pessoa } = defineProps<{
   pessoa?: Pessoa;
+  empresaSelecionada: Empresa;
 }>();
 
 const [nomeRazao, nomeRazaoAttrs] = defineField('nomeRazao');
@@ -87,14 +108,19 @@ const [email, emailAttrs] = defineField('email');
 const [telefone, telefoneAttrs] = defineField('telefone');
 
 watch(visivel, () => {
-  resetForm();
+  resetForm({
+    values: {
+      empresasParaAdicionar: [empresaSelecionada],
+      empresasParaRemover: [],
+    },
+  });
 });
 
 const { erro } = useNotification();
 
 const tentaSalvar = handleSubmit(async (dados) => {
   try {
-    if (!dados.empresas || dados.empresas.length === 0) {
+    if ((!dados.empresasParaAdicionar || dados.empresasParaAdicionar.length === 0) && !pessoa) {
       return erro('Essa pessoa deve estar associada à uma empresa');
     }
 
@@ -119,4 +145,6 @@ const tentaSalvar = handleSubmit(async (dados) => {
 const tipoPessoa = computed(() =>
   !cpfCnpj.value || apenasNumeros(cpfCnpj.value).length < 14 ? 'fisica' : 'juridica'
 );
+
+const modalEmpresasFormularioVisivel = ref(false);
 </script>
