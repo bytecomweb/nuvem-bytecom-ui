@@ -17,7 +17,7 @@
     <template #empty>
       <div class="flex flex-col items-center gap-2 py-8" v-if="!carregando">
         <i class="pi pi-info-circle text-3xl text-gray-500" />
-        <span class="text-gray-500">Nenhuma pessoa encontrada.</span>
+        <span class="text-gray-500">{{ naoEncontradoLabel }}</span>
       </div>
     </template>
     <Column field="id" header="Código" />
@@ -40,7 +40,7 @@
     </Column>
     <Column>
       <template #body="{ data }">
-        <span class="pi pi-ellipsis-v cursor-pointer" @click="(e) => abrirPopover(data, e)" />
+        <span class="pi pi-ellipsis-v cursor-pointer" @click.stop="(e) => abrirPopover(data, e)" />
       </template>
     </Column>
   </DataTable>
@@ -65,6 +65,7 @@ defineProps<{
   pessoas: Pessoa[];
   total: number;
   carregando: boolean;
+  naoEncontradoLabel: string;
 }>();
 
 const pagina = defineModel<number>('pagina', {

@@ -16,6 +16,7 @@
         :pessoas
         :carregando
         :total="paginacao.total"
+        :nao-encontrado-label
         v-model:pagina="paginacao.pagina"
         v-model:tamanho-pagina="paginacao.tamanho"
         @redefinir-senha="tentaRedefinirSenha"
@@ -29,6 +30,10 @@
     v-model:visivel="modalFormulario.visivel"
     :pessoa="modalFormulario.pessoa"
     :empresa-selecionada
+    :cadastrar-titulo
+    :atualizar-titulo
+    :empresas-label
+    :enderecos-label
     @salvou="tentaObterPessoas"
     @redefinir-senha="tentaRedefinirSenha"
   />
@@ -54,12 +59,22 @@ export type TelaPessoasProps = {
   bearerToken?: string;
   ehAdmin?: boolean;
   cadastrarLabel?: string;
+  naoEncontradoLabel?: string;
+  atualizarTitulo?: string;
+  cadastrarTitulo?: string;
+  empresasLabel?: string;
+  enderecosLabel?: string;
 };
 
 const {
   titulo = 'Pessoas',
   bearerToken,
   cadastrarLabel = 'Cadastrar pessoa',
+  naoEncontradoLabel = 'Nenhuma pessoa encontrada.',
+  atualizarTitulo = 'Atualizar pessoa',
+  cadastrarTitulo = 'Cadastrar pessoa',
+  empresasLabel = 'Empresas da pessoa',
+  enderecosLabel = 'Endereços da pessoa',
 } = defineProps<TelaPessoasProps>();
 
 const api = useApi(bearerToken);

@@ -1,7 +1,7 @@
 <template>
   <Dialog
     modal
-    :header="pessoa ? 'Atualizar' : 'Cadastrar'"
+    :header="pessoa ? atualizarTitulo : cadastrarTitulo"
     :style="{ width: '95vw', maxWidth: '38rem' }"
     v-model:visible="visivel"
   >
@@ -73,12 +73,16 @@
   </Dialog>
   <ModalEmpresasFormulario
     v-model:visivel="modalEmpresasFormularioVisivel"
-    titulo="Empresas da pessoa"
+    :titulo="empresasLabel"
     para-adicionar-key="empresasParaAdicionar"
     para-remover-key="empresasParaRemover"
     :empresas="pessoa?.empresas"
   />
-  <TelaPessoasModalEnderecos v-model:visivel="modalEnderecosFormularioVisivel" :errors />
+  <TelaPessoasModalEnderecos
+    v-model:visivel="modalEnderecosFormularioVisivel"
+    :errors
+    :titulo-label="enderecosLabel"
+  />
 </template>
 <script lang="ts" setup>
 import InputCpfOuCnpj from '@/components/inputs/input-cpf-ou-cnpj.vue';
@@ -117,6 +121,10 @@ const { defineField, resetForm, errors, handleSubmit } = useForm({
 const { empresaSelecionada, pessoa } = defineProps<{
   pessoa?: Pessoa;
   empresaSelecionada: Empresa;
+  cadastrarTitulo: string;
+  atualizarTitulo: string;
+  empresasLabel: string;
+  enderecosLabel: string;
 }>();
 
 const emit = defineEmits<{

@@ -55,8 +55,9 @@ const visivel = defineModel<boolean>('visivel', {
   required: true,
 });
 
-const { errors } = defineProps<{
+defineProps<{
   errors: Record<string, string | undefined>;
+  tituloLabel: string;
 }>();
 
 watch(visivel, () => {
