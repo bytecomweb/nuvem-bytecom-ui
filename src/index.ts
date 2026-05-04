@@ -7,6 +7,8 @@ import type { App, Plugin } from 'vue';
 import TelaUsuarios from '@/components/telas/tela-usuarios/tela-usuarios.vue';
 import TelaWhatsApp from '@/components/telas/tela-whatsapp/tela-whatsapp.vue';
 import TelaConfiguracaoConta from '@/components/telas/tela-configuracao-conta/tela-configuracao-conta.vue';
+import TelaPessoas from '@/components/telas/tela-pessoas/tela-pessoas.vue';
+import KeyFilter from 'primevue/keyfilter';
 import {
   API_SERVICE_KEY,
   configureApiService,
@@ -25,6 +27,9 @@ import SelectEmpresa from '@/components/selects/select-empresa.vue';
 import { type Empresa } from '@/types/modelos/empresa';
 import { type Usuario, type UsuarioCargo } from '@/types/modelos/usuario';
 import { type Sistema } from '@/types/modelos/sistema';
+import { type Pessoa } from '@/types/modelos/pessoa';
+import { type PessoaEndereco } from '@/types/modelos/pessoa-endereco';
+import { type PessoaEnderecoTipo } from '@/types/modelos/pessoa-endereco-tipo';
 
 export {
   TelaUsuarios,
@@ -32,6 +37,7 @@ export {
   TelaConfiguracao2fa,
   TelaConfiguracaoConta,
   TelaLogin,
+  TelaPessoas,
   CheckboxComLabel,
   InputMask,
   SelectEmpresa,
@@ -45,6 +51,9 @@ export type {
   Usuario,
   Sistema,
   UsuarioCargo,
+  Pessoa,
+  PessoaEndereco,
+  PessoaEnderecoTipo,
 };
 
 export interface NuvemBytecomUiOptions {
@@ -72,6 +81,8 @@ export default {
 
       app.use(ConfirmationService);
       app.use(ToastService);
+
+      app.directive('keyfilter', KeyFilter);
       app.directive('tooltip', Tooltip);
     }
 
