@@ -16,7 +16,8 @@ export const pessoaFormularioSchema = z.object({
       invalid_type_error: CAMPO_INVALIDO,
       required_error: CAMPO_OBRIGATORIO,
     })
-    .optional(),
+    .optional()
+    .nullable(),
   cpfCnpj: cnpjOuCpfSchema,
   email: z
     .string({

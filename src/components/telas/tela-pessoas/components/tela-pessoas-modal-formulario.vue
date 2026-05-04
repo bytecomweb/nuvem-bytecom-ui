@@ -58,9 +58,15 @@
             @click="modalEnderecosFormularioVisivel = true"
             severity="secondary"
           />
+          <Button
+            v-if="pessoa"
+            :label="pessoa.temSenha ? 'Redefinir senha' : 'Definir senha'"
+            @click="emit('redefinir-senha', pessoa.id)"
+            severity="info"
+          />
         </div>
         <div>
-          <Button label="Salvar" @click="tentaSalvar" />
+          <Button label="Salvar" @click="tentaSalvar" :loading="salvando" :disabled="salvando" />
         </div>
       </div>
     </template>
@@ -70,6 +76,7 @@
     titulo="Empresas da pessoa"
     para-adicionar-key="empresasParaAdicionar"
     para-remover-key="empresasParaRemover"
+    :empresas="pessoa?.empresas"
   />
   <TelaPessoasModalEnderecos v-model:visivel="modalEnderecosFormularioVisivel" :errors />
 </template>
@@ -82,6 +89,7 @@ import TelaPessoasModalEnderecos from '@/components/telas/tela-pessoas/component
 import { pessoaFormularioSchema } from '@/components/telas/tela-pessoas/schemas/pessoa-formulario-schema';
 import useApi from '@/composables/use-api';
 import useNotification from '@/composables/use-notification';
+import atualizarPessoa from '@/data/pessoa/atualizar-pessoa';
 import cadastrarPessoa from '@/data/pessoa/cadastrar-pessoa';
 import { Empresa } from '@/types/modelos/empresa';
 import { Pessoa } from '@/types/modelos/pessoa';
@@ -97,6 +105,7 @@ const visivel = defineModel<boolean>('visivel', {
 });
 
 const { defineField, resetForm, errors, handleSubmit } = useForm({
+  name: 'pessoa-formulario',
   validationSchema: toTypedSchema(pessoaFormularioSchema),
   initialValues: {
     empresasParaAdicionar: [],
@@ -110,6 +119,11 @@ const { empresaSelecionada, pessoa } = defineProps<{
   empresaSelecionada: Empresa;
 }>();
 
+const emit = defineEmits<{
+  salvou: [];
+  'redefinir-senha': [pessoaId: number];
+}>();
+
 const [nomeRazao, nomeRazaoAttrs] = defineField('nomeRazao');
 const [nomeFantasia, nomeFantasiaAttrs] = defineField('nomeFantasia');
 const [cpfCnpj, cpfCnpjAttrs] = defineField('cpfCnpj');
@@ -117,17 +131,39 @@ const [email, emailAttrs] = defineField('email');
 const [telefone, telefoneAttrs] = defineField('telefone');
 
 watch(visivel, () => {
-  resetForm({
-    values: {
-      empresasParaAdicionar: [empresaSelecionada],
-      empresasParaRemover: [],
-    },
-  });
+  if (pessoa) {
+    resetForm({
+      values: {
+        empresasParaAdicionar: [],
+        empresasParaRemover: [],
+        cpfCnpj: pessoa.cpfCnpj,
+        email: pessoa.email,
+        enderecos: pessoa.enderecos,
+        nomeFantasia: pessoa.nomeFantasia,
+        nomeRazao: pessoa.nomeRazao,
+        telefone: pessoa.telefone,
+      },
+    });
+  } else {
+    resetForm(
+      {
+        values: {
+          empresasParaAdicionar: [empresaSelecionada],
+          empresasParaRemover: [],
+        },
+      },
+      {
+        force: true,
+      }
+    );
+  }
 });
 
 const { erro, sucesso } = useNotification();
 
 const api = useApi();
+
+const salvando = ref(false);
 
 const tentaSalvar = handleSubmit(async (dados) => {
   try {
@@ -152,13 +188,51 @@ const tentaSalvar = handleSubmit(async (dados) => {
     dados.cpfCnpj = apenasNumeros(dados.cpfCnpj);
     dados.telefone = dados.telefone ? apenasNumeros(dados.telefone) : dados.telefone;
 
-    await cadastrarPessoa(api, dados);
+    salvando.value = true;
 
-    visivel.value = false;
+    if (pessoa) {
+      const empresaIdsOriginais = new Set(pessoa.empresas.map(({ empresaId }) => empresaId));
+      const enderecoIdsAtuais = new Set(dados.enderecos.map((e) => e.id).filter(Boolean));
 
-    sucesso('Pessoa cadastrada com sucesso');
+      await atualizarPessoa(api, pessoa.id, {
+        nomeRazao: dados.nomeRazao,
+        nomeFantasia: dados.nomeFantasia || undefined,
+        cpfCnpj: dados.cpfCnpj,
+        email: dados.email,
+        telefone: dados.telefone || undefined,
+        empresasParaAdicionar: dados.empresasParaAdicionar
+          .filter((e) => !empresaIdsOriginais.has(e.id))
+          .map((e) => e.id),
+        empresasParaRemover: dados.empresasParaRemover.map((e) => e.id),
+        enderecos: dados.enderecos.map((e) => ({
+          id: e.id,
+          tipo: e.tipo,
+          logradouro: e.logradouro,
+          cep: apenasNumeros(e.cep),
+          bairro: e.bairro,
+          cidade: e.cidade,
+          uf: e.uf.substring(0, 2),
+          complemento: e.complemento || undefined,
+          numero: e.numero || undefined,
+        })),
+        enderecosParaRemover: pessoa.enderecos
+          .filter((e) => !enderecoIdsAtuais.has(e.id))
+          .map((e) => e.id),
+      });
+
+      visivel.value = false;
+      emit('salvou');
+      sucesso('Pessoa atualizada com sucesso');
+    } else {
+      await cadastrarPessoa(api, dados);
+      visivel.value = false;
+      emit('salvou');
+      sucesso('Pessoa cadastrada com sucesso');
+    }
   } catch (err) {
     erro(obterErroDaRequisicao(err) || 'Não foi possível realizar a operação');
+  } finally {
+    salvando.value = false;
   }
 });
 

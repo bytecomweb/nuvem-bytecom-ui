@@ -19,6 +19,7 @@
         v-model:pagina="paginacao.pagina"
         v-model:tamanho-pagina="paginacao.tamanho"
         @redefinir-senha="tentaRedefinirSenha"
+        @selecionar-pessoa="abrirModalAtualizar"
       />
     </div>
   </main>
@@ -28,6 +29,8 @@
     v-model:visivel="modalFormulario.visivel"
     :pessoa="modalFormulario.pessoa"
     :empresa-selecionada
+    @salvou="tentaObterPessoas"
+    @redefinir-senha="tentaRedefinirSenha"
   />
 </template>
 <script lang="ts" setup>
@@ -133,6 +136,11 @@ const modalFormulario = reactive({
 
 const abrirModalCriar = () => {
   modalFormulario.pessoa = undefined;
+  modalFormulario.visivel = true;
+};
+
+const abrirModalAtualizar = (pessoa: Pessoa) => {
+  modalFormulario.pessoa = pessoa;
   modalFormulario.visivel = true;
 };
 </script>

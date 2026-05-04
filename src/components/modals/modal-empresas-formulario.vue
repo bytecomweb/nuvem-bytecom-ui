@@ -36,7 +36,12 @@
       </Column>
       <Column>
         <template #body="{ data }">
-          <Button icon="pi pi-times" text severity="danger" @click="removerEmpresa(data)" />
+          <Button
+            icon="pi pi-times"
+            text
+            severity="danger"
+            @click="confirmarRemoverEmpresa($event, data)"
+          />
         </template>
       </Column>
     </DataTable>
@@ -49,6 +54,7 @@ import useNotification from '@/composables/use-notification';
 import { Empresa } from '@/types/modelos/empresa';
 import { PessoaEmpresa } from '@/types/modelos/pessoa-empresa';
 import { Avatar, Button, Column, DataTable, Dialog } from 'primevue';
+import { useConfirm } from 'primevue/useconfirm';
 import { useFieldArray } from 'vee-validate';
 import { computed, nextTick, ref, watch } from 'vue';
 
@@ -76,6 +82,7 @@ const {
 } = useFieldArray<Empresa>(paraRemoverKey);
 
 const empresaInterna = ref<Empresa>();
+const confirm = useConfirm();
 
 const { aviso } = useNotification();
 
@@ -141,5 +148,26 @@ const removerEmpresa = ({ empresa, index }: EmpresaParaMostrar) => {
   } else {
     paraRemoverPush(empresa);
   }
+};
+
+const confirmarRemoverEmpresa = (event: Event, empresaParaMostrar: EmpresaParaMostrar) => {
+  if (empresasParaMostrar.value.length === 1) {
+    return aviso('É preciso ter ao menos uma empresa adicionada');
+  }
+
+  confirm.require({
+    target: event.currentTarget as HTMLElement,
+    header: 'Remover empresa?',
+    message: `Deseja realmente remover ${empresaParaMostrar.empresa.nomeRazao}?`,
+    acceptLabel: 'Remover',
+    acceptProps: {
+      severity: 'danger',
+    },
+    rejectLabel: 'Cancelar',
+    rejectProps: {
+      severity: 'secondary',
+    },
+    accept: () => removerEmpresa(empresaParaMostrar),
+  });
 };
 </script>

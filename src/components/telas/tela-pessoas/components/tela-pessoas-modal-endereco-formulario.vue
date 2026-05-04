@@ -1,5 +1,10 @@
 <template>
-  <Dialog header="Adicionar endereço" modal v-model:visible="visivel" class="min-w-125!">
+  <Dialog
+    :header="typeof index === 'number' ? 'Editar endereço' : 'Adicionar endereço'"
+    modal
+    v-model:visible="visivel"
+    class="min-w-125!"
+  >
     <div class="mt-2 grid grid-cols-[1fr_1fr_1fr] gap-3">
       <Label label="Tipo" :feedback="errors.tipo">
         <Select
@@ -58,7 +63,7 @@
       </Label>
     </div>
     <template #footer>
-      <Button label="Adicionar" @click="tentaSalvar" />
+      <Button :label="typeof index === 'number' ? 'Atualizar' : 'Adicionar'" @click="tentaSalvar" />
     </template>
   </Dialog>
 </template>
@@ -76,6 +81,7 @@ import { watch } from 'vue';
 import z from 'zod';
 
 const { defineField, resetForm, errors, handleSubmit } = useForm({
+  name: 'pessoa-endereco-formulario',
   validationSchema: toTypedSchema(pessoaEnderecoFormularioSchema),
 });
 
@@ -98,9 +104,14 @@ const visivel = defineModel<boolean>('visivel', {
 });
 
 watch(visivel, () => {
-  resetForm({
-    values: endereco,
-  });
+  resetForm(
+    {
+      values: endereco ?? {},
+    },
+    {
+      force: true,
+    }
+  );
 });
 
 const tipoEnderecoOpcoes: SelectPadrao<PessoaEnderecoTipo>[] = [

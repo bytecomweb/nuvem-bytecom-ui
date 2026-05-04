@@ -8,8 +8,11 @@
     :loading="carregando"
     :rows-per-page-options="[5, 20, 50, 100]"
     striped-rows
+    row-hover
+    :row-class="() => 'cursor-pointer'"
     @update:rows="(novoTamanhoPagina) => (tamanhoPagina = novoTamanhoPagina)"
     @page="(e) => (pagina = e.page + 1)"
+    @row-click="(e) => emit('selecionar-pessoa', e.data)"
   >
     <template #empty>
       <div class="flex flex-col items-center gap-2 py-8" v-if="!carregando">
@@ -53,37 +56,38 @@
   </Popover>
 </template>
 <script lang="ts" setup>
-  import TextoOpcional from '@/components/texto-opcional.vue';
-  import { Pessoa } from '@/types/modelos/pessoa';
-  import { Column, DataTable, Popover, Tag } from 'primevue';
-  import { ref, useTemplateRef } from 'vue';
+import TextoOpcional from '@/components/texto-opcional.vue';
+import { Pessoa } from '@/types/modelos/pessoa';
+import { Column, DataTable, Popover, Tag } from 'primevue';
+import { ref, useTemplateRef } from 'vue';
 
-  defineProps<{
-    pessoas: Pessoa[];
-    total: number;
-    carregando: boolean;
-  }>();
+defineProps<{
+  pessoas: Pessoa[];
+  total: number;
+  carregando: boolean;
+}>();
 
-  const pagina = defineModel<number>('pagina', {
-    required: true,
-  });
+const pagina = defineModel<number>('pagina', {
+  required: true,
+});
 
-  const tamanhoPagina = defineModel<number>('tamanhoPagina', {
-    required: true,
-  });
+const tamanhoPagina = defineModel<number>('tamanhoPagina', {
+  required: true,
+});
 
-  const popover = useTemplateRef('popover');
+const popover = useTemplateRef('popover');
 
-  const emit = defineEmits<{
-    'redefinir-senha': [id: number];
-  }>();
+const emit = defineEmits<{
+  'redefinir-senha': [id: number];
+  'selecionar-pessoa': [pessoa: Pessoa];
+}>();
 
-  const pessoaSelecionada = ref<Pessoa>();
+const pessoaSelecionada = ref<Pessoa>();
 
-  const abrirPopover = (pessoa: Pessoa, e: Event) => {
-    if (popover.value) {
-      pessoaSelecionada.value = pessoa;
-      popover.value.show(e);
-    }
-  };
+const abrirPopover = (pessoa: Pessoa, e: Event) => {
+  if (popover.value) {
+    pessoaSelecionada.value = pessoa;
+    popover.value.show(e);
+  }
+};
 </script>

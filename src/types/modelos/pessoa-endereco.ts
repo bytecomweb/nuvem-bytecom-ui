@@ -9,4 +9,6 @@ export type PessoaEndereco = {
   bairro: string;
   complemento?: string;
   numero?: string;
+  cidade: string;
+  uf: string;
 };

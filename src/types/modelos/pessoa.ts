@@ -1,3 +1,4 @@
+import { PessoaEmpresa } from '@/types/modelos/pessoa-empresa';
 import { PessoaEndereco } from '@/types/modelos/pessoa-endereco';
 
 export type Pessoa = {
@@ -11,4 +12,5 @@ export type Pessoa = {
   atualizadoEm?: string;
   temSenha?: boolean;
   enderecos: PessoaEndereco[];
+  empresas: PessoaEmpresa[];
 };
