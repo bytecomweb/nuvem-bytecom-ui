@@ -3,7 +3,7 @@
     :options="empresas"
     option-label="nomeRazao"
     fluid
-    :loading="carregando"
+    :loading="carregando && !modelValue"
     label-id="empresaSelecionada"
     v-model="modelValue"
     :filter="filtro"
@@ -21,72 +21,72 @@
   </Select>
 </template>
 <script lang="ts" setup>
-  import useApi from '@/composables/use-api';
-  import useNotification from '@/composables/use-notification';
-  import obterEmpresasDoUsuario from '@/data/usuario/obter-empresas-do-usuario';
-  import { Empresa } from '@/types/modelos/empresa';
-  import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
-  import { Select } from 'primevue';
-  import { onMounted, ref, useTemplateRef, watch } from 'vue';
+import useApi from '@/composables/use-api';
+import useNotification from '@/composables/use-notification';
+import obterEmpresasDoUsuario from '@/data/usuario/obter-empresas-do-usuario';
+import { Empresa } from '@/types/modelos/empresa';
+import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
+import { Select } from 'primevue';
+import { onMounted, ref, useTemplateRef, watch } from 'vue';
 
-  const modelValue = defineModel<Empresa | undefined>({
-    required: true,
-  });
+const modelValue = defineModel<Empresa | undefined>({
+  required: true,
+});
 
-  const { selecionarPrimeiroAutomaticamente, bearerToken } = defineProps<{
-    selecionarPrimeiroAutomaticamente?: boolean;
-    filtro?: boolean;
-    bearerToken?: string;
-  }>();
+const { selecionarPrimeiroAutomaticamente, bearerToken } = defineProps<{
+  selecionarPrimeiroAutomaticamente?: boolean;
+  filtro?: boolean;
+  bearerToken?: string;
+}>();
 
-  const api = useApi(bearerToken);
+const api = useApi(bearerToken);
 
-  const select = useTemplateRef('select');
+const select = useTemplateRef('select');
 
-  const busca = ref('');
-  const carregando = ref(false);
-  const empresas = ref<Empresa[]>([]);
+const busca = ref('');
+const carregando = ref(false);
+const empresas = ref<Empresa[]>([]);
 
-  async function tentaObterEmpresas() {
-    try {
-      carregando.value = true;
+async function tentaObterEmpresas() {
+  try {
+    carregando.value = true;
 
-      const { dados } = await obterEmpresasDoUsuario(api, busca.value);
+    const { dados } = await obterEmpresasDoUsuario(api, busca.value);
 
-      empresas.value = dados.map((empresa) => ({
-        ...empresa,
-      }));
-    } catch (err) {
-      erro(obterErroDaRequisicao(err) || 'Não foi possível carregar as empresas');
-    } finally {
-      carregando.value = false;
-    }
+    empresas.value = dados.map((empresa) => ({
+      ...empresa,
+    }));
+  } catch (err) {
+    erro(obterErroDaRequisicao(err) || 'Não foi possível carregar as empresas');
+  } finally {
+    carregando.value = false;
   }
+}
 
-  const { erro } = useNotification();
+const { erro } = useNotification();
 
-  watch(empresas, () => {
-    if (empresas.value.length > 0 && !modelValue.value && selecionarPrimeiroAutomaticamente) {
-      modelValue.value = empresas.value[0];
-    }
-  });
+watch(empresas, () => {
+  if (empresas.value.length > 0 && !modelValue.value && selecionarPrimeiroAutomaticamente) {
+    modelValue.value = empresas.value[0];
+  }
+});
 
-  const aoEsconder = () => {
-    // Reseta a busca ao fechar
-    if (
-      modelValue.value &&
-      select.value &&
-      'filterValue' in select.value &&
-      typeof select.value.filterValue === 'string'
-    ) {
-      busca.value = '';
-      select.value.filterValue = '';
-    }
-  };
+const aoEsconder = () => {
+  // Reseta a busca ao fechar
+  if (
+    modelValue.value &&
+    select.value &&
+    'filterValue' in select.value &&
+    typeof select.value.filterValue === 'string'
+  ) {
+    busca.value = '';
+    select.value.filterValue = '';
+  }
+};
 
-  onMounted(tentaObterEmpresas);
+onMounted(tentaObterEmpresas);
 
-  watch(busca, () => {
-    tentaObterEmpresas();
-  });
+watch(busca, () => {
+  tentaObterEmpresas();
+});
 </script>
