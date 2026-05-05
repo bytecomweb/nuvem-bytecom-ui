@@ -24,6 +24,9 @@ import TelaLogin from '@/components/telas/tela-login/tela-login.vue';
 import CheckboxComLabel from '@/components/inputs/checkbox-com-label.vue';
 import InputMask from '@/components/inputs/input-mask.vue';
 import SelectEmpresa from '@/components/selects/select-empresa.vue';
+import inputCep from '@/components/inputs/input-cep.vue';
+import inputCpfOuCnpj from '@/components/inputs/input-cpf-ou-cnpj.vue';
+import inputTelefone from '@/components/inputs/input-telefone.vue';
 import { type Empresa } from '@/types/modelos/empresa';
 import { type Usuario, type UsuarioCargo } from '@/types/modelos/usuario';
 import { type Sistema } from '@/types/modelos/sistema';
@@ -41,6 +44,9 @@ export {
   CheckboxComLabel,
   InputMask,
   SelectEmpresa,
+  inputCpfOuCnpj,
+  inputCep,
+  inputTelefone,
 };
 export { API_SERVICE_KEY, configureApiService, createApiService, getApiService, useApiService };
 export type {
