@@ -286,8 +286,14 @@ function confirmarRemocao(usuario: Usuario) {
   });
 }
 
-watch([empresaSelecionada, () => filtro.campo, () => filtro.cargo], () => {
-  paginacao.paginaAtual = 1;
-  carregarUsuarios();
-});
+watch(
+  [empresaSelecionada, () => filtro.campo, () => filtro.cargo],
+  () => {
+    paginacao.paginaAtual = 1;
+    carregarUsuarios();
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
