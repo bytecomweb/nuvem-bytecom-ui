@@ -79,7 +79,7 @@ const {
 
 const api = useApi(bearerToken);
 
-const empresaSelecionada = ref<Empresa>();
+const empresaSelecionada = defineModel<Empresa | undefined>('empresaSelecionada');
 
 const pessoas = ref<Pessoa[]>([]);
 
