@@ -3,7 +3,7 @@
     :options="empresas"
     option-label="nomeRazao"
     fluid
-    :loading="carregando && !modelValue"
+    :loading="carregando"
     label-id="empresaSelecionada"
     v-model="modelValue"
     :filter="filtro"
@@ -49,6 +49,10 @@ const empresas = ref<Empresa[]>([]);
 
 async function tentaObterEmpresas() {
   try {
+    if (empresas.value.length === 0 && modelValue.value) {
+      empresas.value = [modelValue.value];
+    }
+
     carregando.value = true;
 
     const { dados } = await obterEmpresasDoUsuario(api, busca.value);
@@ -56,6 +60,22 @@ async function tentaObterEmpresas() {
     empresas.value = dados.map((empresa) => ({
       ...empresa,
     }));
+
+    if (modelValue.value) {
+      if (empresas.value.length === 0) {
+        modelValue.value = undefined;
+      } else {
+        const taNaLista = empresas.value.some((empresa) => empresa.id === modelValue.value?.id);
+
+        if (!taNaLista) {
+          if (selecionarPrimeiroAutomaticamente) {
+            modelValue.value = empresas.value[0];
+          } else {
+            modelValue.value = undefined;
+          }
+        }
+      }
+    }
   } catch (err) {
     erro(obterErroDaRequisicao(err) || 'Não foi possível carregar as empresas');
   } finally {
