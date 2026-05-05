@@ -124,13 +124,25 @@ const tentaObterPessoas = async () => {
   }
 };
 
-watch([empresaSelecionada, () => paginacao.pagina, () => paginacao.tamanho, filtros], () => {
-  tentaObterPessoas();
-});
+watch(
+  [empresaSelecionada, () => paginacao.pagina, () => paginacao.tamanho, filtros],
+  () => {
+    tentaObterPessoas();
+  },
+  {
+    immediate: true,
+  }
+);
 
-watch([empresaSelecionada, filtros], () => {
-  paginacao.pagina = 1;
-});
+watch(
+  [empresaSelecionada, filtros],
+  () => {
+    paginacao.pagina = 1;
+  },
+  {
+    immediate: true,
+  }
+);
 
 const linkRedefinicao = ref<string>();
 
