@@ -13,6 +13,9 @@ export default async function cadastrarPessoa(
     cpfCnpj: dados.cpfCnpj,
     email: dados.email,
     telefone: dados.telefone || undefined,
+    enquadramentoTributario: dados.enquadramentoTributario || undefined,
+    inscricaoEstadual: dados.inscricaoEstadual || undefined,
+    inscricaoMunicipal: dados.inscricaoMunicipal || undefined,
     empresaIds: dados.empresasParaAdicionar.map(({ id }) => id),
     enderecos: dados.enderecos.map((endereco) => ({
       tipo: endereco.tipo,

@@ -1,5 +1,6 @@
 import { Pessoa } from '@/types/modelos/pessoa';
 import { PessoaEnderecoTipo } from '@/types/modelos/pessoa-endereco-tipo';
+import { PessoaEnquadramentoTributario } from '@/types/modelos/pessoa-enquadramento-tributario';
 import { RespostaSucesso } from '@/types/respostas/resposta-sucesso';
 import { AxiosInstance } from 'axios';
 
@@ -9,6 +10,9 @@ type AtualizarPessoaParametros = {
   cpfCnpj?: string;
   email?: string;
   telefone?: string;
+  enquadramentoTributario?: PessoaEnquadramentoTributario;
+  inscricaoEstadual?: string;
+  inscricaoMunicipal?: string;
   empresasParaAdicionar?: number[];
   empresasParaRemover?: number[];
   enderecos?: {

@@ -1,5 +1,6 @@
 import { PessoaEmpresa } from '@/types/modelos/pessoa-empresa';
 import { PessoaEndereco } from '@/types/modelos/pessoa-endereco';
+import { PessoaEnquadramentoTributario } from '@/types/modelos/pessoa-enquadramento-tributario';
 
 export type Pessoa = {
   id: number;
@@ -8,6 +9,9 @@ export type Pessoa = {
   cpfCnpj: string;
   email: string;
   telefone: string;
+  enquadramentoTributario?: PessoaEnquadramentoTributario;
+  inscricaoEstadual?: string;
+  inscricaoMunicipal?: string;
   criadoEm: string;
   atualizadoEm?: string;
   temSenha?: boolean;

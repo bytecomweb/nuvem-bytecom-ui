@@ -44,6 +44,39 @@
           :invalid="!!errors.telefone"
         />
       </Label>
+      <template v-if="tipoPessoa === 'juridica'">
+        <Label
+          label="Enquadramento Tributário"
+          :feedback="errors.enquadramentoTributario"
+          class="col-span-5"
+        >
+          <Select
+            v-bind="enquadramentoTributarioAttrs"
+            v-model="enquadramentoTributario"
+            :options="enquadramentoTributarioOpcoes"
+            option-label="label"
+            option-value="value"
+            fluid
+            :invalid="!!errors.enquadramentoTributario"
+          />
+        </Label>
+        <Label label="Inscrição Estadual" :feedback="errors.inscricaoEstadual" class="col-span-3">
+          <InputText
+            v-bind="inscricaoEstadualAttrs"
+            v-model="inscricaoEstadual"
+            fluid
+            :invalid="!!errors.inscricaoEstadual"
+          />
+        </Label>
+        <Label label="Inscrição Municipal" :feedback="errors.inscricaoMunicipal" class="col-span-2">
+          <InputText
+            v-bind="inscricaoMunicipalAttrs"
+            v-model="inscricaoMunicipal"
+            fluid
+            :invalid="!!errors.inscricaoMunicipal"
+          />
+        </Label>
+      </template>
     </div>
     <template #footer>
       <div class="flex justify-between items-center w-full">
@@ -100,7 +133,7 @@ import { Pessoa } from '@/types/modelos/pessoa';
 import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
 import apenasNumeros from '@/utils/texto/apenas-numeros';
 import { toTypedSchema } from '@vee-validate/zod';
-import { Button, Dialog, InputText } from 'primevue';
+import { Button, Dialog, InputText, Select } from 'primevue';
 import { useForm } from 'vee-validate';
 import { computed, ref, watch } from 'vue';
 
@@ -137,6 +170,20 @@ const [nomeFantasia, nomeFantasiaAttrs] = defineField('nomeFantasia');
 const [cpfCnpj, cpfCnpjAttrs] = defineField('cpfCnpj');
 const [email, emailAttrs] = defineField('email');
 const [telefone, telefoneAttrs] = defineField('telefone');
+const [enquadramentoTributario, enquadramentoTributarioAttrs] =
+  defineField('enquadramentoTributario');
+const [inscricaoEstadual, inscricaoEstadualAttrs] = defineField('inscricaoEstadual');
+const [inscricaoMunicipal, inscricaoMunicipalAttrs] = defineField('inscricaoMunicipal');
+
+const enquadramentoTributarioOpcoes = [
+  { value: 'LUCRO_REAL_OU_PRESUMIDO', label: 'Lucro Real/Presumido' },
+  { value: 'SIMPLES_OU_NORMAL_SEM_CREDITO', label: 'Simples / Normal sem Crédito' },
+  { value: 'SIMPLES_COM_COBRANCA_ST', label: 'Simples com Cobrança de ST' },
+  { value: 'SIMPLES_SEM_COBRANCA_ST', label: 'Normal sem Cobrança de ST' },
+  { value: 'NAO_CONTRIBUINTE', label: 'Não Contribuinte' },
+  { value: 'MEI_NAO_CONTRIBUINTE', label: 'MEI - Não Contribuinte' },
+  { value: 'MEI_CONTRIBUINTE', label: 'MEI - Contribuinte' },
+];
 
 watch(visivel, () => {
   if (pessoa) {
@@ -150,6 +197,9 @@ watch(visivel, () => {
         nomeFantasia: pessoa.nomeFantasia,
         nomeRazao: pessoa.nomeRazao,
         telefone: pessoa.telefone,
+        enquadramentoTributario: pessoa.enquadramentoTributario,
+        inscricaoEstadual: pessoa.inscricaoEstadual,
+        inscricaoMunicipal: pessoa.inscricaoMunicipal,
       },
     });
   } else {
@@ -208,6 +258,9 @@ const tentaSalvar = handleSubmit(async (dados) => {
         cpfCnpj: dados.cpfCnpj,
         email: dados.email,
         telefone: dados.telefone || undefined,
+        enquadramentoTributario: dados.enquadramentoTributario || undefined,
+        inscricaoEstadual: dados.inscricaoEstadual || undefined,
+        inscricaoMunicipal: dados.inscricaoMunicipal || undefined,
         empresasParaAdicionar: dados.empresasParaAdicionar
           .filter((e) => !empresaIdsOriginais.has(e.id))
           .map((e) => e.id),
