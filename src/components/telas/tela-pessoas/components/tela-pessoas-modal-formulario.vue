@@ -280,6 +280,14 @@ const tentaSalvar = handleSubmit(async (dados) => {
     dados.cpfCnpj = apenasNumeros(dados.cpfCnpj);
     dados.telefone = dados.telefone ? apenasNumeros(dados.telefone) : dados.telefone;
 
+    const ehPessoaJuridica = dados.cpfCnpj.length >= 14;
+
+    if (!ehPessoaJuridica) {
+      dados.enquadramentoTributario = undefined;
+      dados.inscricaoEstadual = undefined;
+      dados.inscricaoMunicipal = undefined;
+    }
+
     salvando.value = true;
 
     if (pessoa) {
@@ -351,4 +359,12 @@ const modalEmpresasFormularioVisivel = ref(false);
 const modalEnderecosFormularioVisivel = ref(false);
 
 const modalContatosFormularioVisivel = ref(false);
+
+watch(tipoPessoa, (novoTipo) => {
+  if (novoTipo === 'fisica') {
+    enquadramentoTributario.value = undefined;
+    inscricaoEstadual.value = undefined;
+    inscricaoMunicipal.value = undefined;
+  }
+});
 </script>
