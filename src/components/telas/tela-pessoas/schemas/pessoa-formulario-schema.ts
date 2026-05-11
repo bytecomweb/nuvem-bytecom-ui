@@ -1,4 +1,5 @@
 import apenasNumeros from '@/utils/texto/apenas-numeros';
+import { pessoaContatoFormularioSchema } from '@/components/telas/tela-pessoas/schemas/pessoa-contato-formulario-schema';
 import { pessoaEnderecoFormularioSchema } from '@/components/telas/tela-pessoas/schemas/pessoa-endereco-formulario-schema';
 import { cnpjOuCpfSchema } from '@/schemas/cnpj-ou-cpf-schema';
 import { empresaSchema } from '@/schemas/modelos/empresa-schema';
@@ -46,6 +47,7 @@ export const pessoaFormularioSchema = z
     empresasParaAdicionar: z.array(empresaSchema),
     empresasParaRemover: z.array(empresaSchema),
     enderecos: z.array(pessoaEnderecoFormularioSchema),
+    contatos: z.array(pessoaContatoFormularioSchema),
   })
   .superRefine((data, ctx) => {
     const isPj = apenasNumeros(data.cpfCnpj ?? '').length >= 14;

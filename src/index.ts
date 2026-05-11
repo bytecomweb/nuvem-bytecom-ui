@@ -31,8 +31,13 @@ import { type Empresa } from '@/types/modelos/empresa';
 import { type Usuario, type UsuarioCargo } from '@/types/modelos/usuario';
 import { type Sistema } from '@/types/modelos/sistema';
 import { type Pessoa } from '@/types/modelos/pessoa';
+import { type PessoaContato } from '@/types/modelos/pessoa-contato';
+import { type PessoaContatoTipo } from '@/types/modelos/pessoa-contato-tipo';
 import { type PessoaEndereco } from '@/types/modelos/pessoa-endereco';
 import { type PessoaEnderecoTipo } from '@/types/modelos/pessoa-endereco-tipo';
+import { cnpjOuCpfSchema } from '@/schemas/cnpj-ou-cpf-schema';
+import { cnpjSchema } from '@/schemas/cnpj-schema';
+import { cpfSchema } from '@/schemas/cpf-schema';
 
 export {
   TelaUsuarios,
@@ -49,6 +54,7 @@ export {
   InputTelefone,
 };
 export { API_SERVICE_KEY, configureApiService, createApiService, getApiService, useApiService };
+export { cpfSchema, cnpjSchema, cnpjOuCpfSchema };
 export type {
   ApiService,
   ApiServiceConfig,
@@ -58,6 +64,8 @@ export type {
   Sistema,
   UsuarioCargo,
   Pessoa,
+  PessoaContato,
+  PessoaContatoTipo,
   PessoaEndereco,
   PessoaEnderecoTipo,
 };

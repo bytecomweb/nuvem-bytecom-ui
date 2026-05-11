@@ -1,4 +1,5 @@
 import { Pessoa } from '@/types/modelos/pessoa';
+import { PessoaContatoTipo } from '@/types/modelos/pessoa-contato-tipo';
 import { PessoaEnderecoTipo } from '@/types/modelos/pessoa-endereco-tipo';
 import { PessoaEnquadramentoTributario } from '@/types/modelos/pessoa-enquadramento-tributario';
 import { RespostaSucesso } from '@/types/respostas/resposta-sucesso';
@@ -27,6 +28,14 @@ type AtualizarPessoaParametros = {
     numero?: string;
   }[];
   enderecosParaRemover?: number[];
+  contatos?: {
+    id?: number;
+    tipo: PessoaContatoTipo;
+    fone?: string;
+    email?: string;
+    ehWhatsApp?: 0 | 1;
+  }[];
+  contatosParaRemover?: number[];
 };
 
 export default async function atualizarPessoa(

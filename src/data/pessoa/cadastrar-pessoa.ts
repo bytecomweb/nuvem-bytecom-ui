@@ -27,6 +27,12 @@ export default async function cadastrarPessoa(
       complemento: endereco.complemento || undefined,
       numero: endereco.numero || undefined,
     })),
+    contatos: dados.contatos.map((contato) => ({
+      tipo: contato.tipo,
+      fone: contato.fone ? apenasNumeros(contato.fone) : undefined,
+      email: contato.email || undefined,
+      ehWhatsApp: contato.ehWhatsApp ? 1 : 0,
+    })),
   });
 
   return data;

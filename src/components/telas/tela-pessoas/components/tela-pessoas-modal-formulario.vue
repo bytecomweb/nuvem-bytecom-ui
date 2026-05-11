@@ -92,6 +92,11 @@
             severity="secondary"
           />
           <Button
+            label="Contatos"
+            @click="modalContatosFormularioVisivel = true"
+            severity="secondary"
+          />
+          <Button
             v-if="pessoa"
             :label="pessoa.temSenha ? 'Redefinir senha' : 'Definir senha'"
             @click="emit('redefinir-senha', pessoa.id)"
@@ -116,12 +121,18 @@
     :errors
     :titulo-label="enderecosLabel"
   />
+  <TelaPessoasModalContatos
+    v-model:visivel="modalContatosFormularioVisivel"
+    :errors
+    :titulo-label="contatosLabel"
+  />
 </template>
 <script lang="ts" setup>
 import InputCpfOuCnpj from '@/components/inputs/input-cpf-ou-cnpj.vue';
 import InputTelefone from '@/components/inputs/input-telefone.vue';
 import Label from '@/components/label.vue';
 import ModalEmpresasFormulario from '@/components/modals/modal-empresas-formulario.vue';
+import TelaPessoasModalContatos from '@/components/telas/tela-pessoas/components/tela-pessoas-modal-contatos.vue';
 import TelaPessoasModalEnderecos from '@/components/telas/tela-pessoas/components/tela-pessoas-modal-enderecos.vue';
 import { pessoaFormularioSchema } from '@/components/telas/tela-pessoas/schemas/pessoa-formulario-schema';
 import useApi from '@/composables/use-api';
@@ -148,6 +159,7 @@ const { defineField, resetForm, errors, handleSubmit } = useForm({
     empresasParaAdicionar: [],
     empresasParaRemover: [],
     enderecos: [],
+    contatos: [],
   },
 });
 
@@ -158,6 +170,7 @@ const { empresaSelecionada, pessoa } = defineProps<{
   atualizarTitulo: string;
   empresasLabel: string;
   enderecosLabel: string;
+  contatosLabel: string;
 }>();
 
 const emit = defineEmits<{
@@ -192,6 +205,13 @@ watch(visivel, () => {
         empresasParaAdicionar: [],
         empresasParaRemover: [],
         cpfCnpj: pessoa.cpfCnpj,
+        contatos: pessoa.contatos.map((contato) => ({
+          id: contato.id,
+          tipo: contato.tipo,
+          fone: contato.fone,
+          email: contato.email,
+          ehWhatsApp: contato.ehWhatsApp === 1,
+        })),
         email: pessoa.email,
         enderecos: pessoa.enderecos,
         nomeFantasia: pessoa.nomeFantasia,
@@ -243,6 +263,20 @@ const tentaSalvar = handleSubmit(async (dados) => {
       return erro('A pessoa não pode possuir mais de um endereço principal');
     }
 
+    if (!dados.contatos || dados.contatos.length === 0) {
+      return erro('A pessoa deve possuir ao menos um contato do tipo principal');
+    }
+
+    const contatosPrincipais = dados.contatos.filter((contato) => contato.tipo === 'PRINCIPAL');
+
+    if (contatosPrincipais.length === 0) {
+      return erro('A pessoa deve possuir um contato principal');
+    }
+
+    if (contatosPrincipais.length > 1) {
+      return erro('A pessoa não pode possuir mais de um contato principal');
+    }
+
     dados.cpfCnpj = apenasNumeros(dados.cpfCnpj);
     dados.telefone = dados.telefone ? apenasNumeros(dados.telefone) : dados.telefone;
 
@@ -251,6 +285,7 @@ const tentaSalvar = handleSubmit(async (dados) => {
     if (pessoa) {
       const empresaIdsOriginais = new Set(pessoa.empresas.map(({ empresaId }) => empresaId));
       const enderecoIdsAtuais = new Set(dados.enderecos.map((e) => e.id).filter(Boolean));
+      const contatoIdsAtuais = new Set(dados.contatos.map((c) => c.id).filter(Boolean));
 
       await atualizarPessoa(api, pessoa.id, {
         nomeRazao: dados.nomeRazao,
@@ -279,6 +314,16 @@ const tentaSalvar = handleSubmit(async (dados) => {
         enderecosParaRemover: pessoa.enderecos
           .filter((e) => !enderecoIdsAtuais.has(e.id))
           .map((e) => e.id),
+        contatos: dados.contatos.map((c) => ({
+          id: c.id,
+          tipo: c.tipo,
+          fone: c.fone || undefined,
+          email: c.email || undefined,
+          ehWhatsApp: c.ehWhatsApp ? 1 : 0,
+        })),
+        contatosParaRemover: pessoa.contatos
+          .filter((c) => !contatoIdsAtuais.has(c.id))
+          .map((c) => c.id),
       });
 
       visivel.value = false;
@@ -304,4 +349,6 @@ const tipoPessoa = computed(() =>
 const modalEmpresasFormularioVisivel = ref(false);
 
 const modalEnderecosFormularioVisivel = ref(false);
+
+const modalContatosFormularioVisivel = ref(false);
 </script>

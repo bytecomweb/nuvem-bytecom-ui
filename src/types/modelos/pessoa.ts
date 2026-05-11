@@ -1,3 +1,4 @@
+import { PessoaContato } from '@/types/modelos/pessoa-contato';
 import { PessoaEmpresa } from '@/types/modelos/pessoa-empresa';
 import { PessoaEndereco } from '@/types/modelos/pessoa-endereco';
 import { PessoaEnquadramentoTributario } from '@/types/modelos/pessoa-enquadramento-tributario';
@@ -17,4 +18,5 @@ export type Pessoa = {
   temSenha?: boolean;
   enderecos: PessoaEndereco[];
   empresas: PessoaEmpresa[];
+  contatos: PessoaContato[];
 };

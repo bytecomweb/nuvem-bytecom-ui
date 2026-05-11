@@ -34,6 +34,7 @@
     :atualizar-titulo
     :empresas-label
     :enderecos-label
+    :contatos-label
     @salvou="tentaObterPessoas"
     @redefinir-senha="tentaRedefinirSenha"
   />
@@ -64,6 +65,7 @@ export type TelaPessoasProps = {
   cadastrarTitulo?: string;
   empresasLabel?: string;
   enderecosLabel?: string;
+  contatosLabel?: string;
 };
 
 const {
@@ -75,6 +77,7 @@ const {
   cadastrarTitulo = 'Cadastrar pessoa',
   empresasLabel = 'Empresas da pessoa',
   enderecosLabel = 'Endereços da pessoa',
+  contatosLabel = 'Contatos da pessoa',
 } = defineProps<TelaPessoasProps>();
 
 const api = useApi(bearerToken);
