@@ -5,8 +5,8 @@
     v-model:visible="visivel"
     class="min-w-125!"
   >
-    <div class="mt-2 grid grid-cols-[1fr_1fr] gap-3">
-      <Label label="Tipo" :feedback="errors.tipo">
+    <div class="mt-2 grid grid-cols-2 gap-3">
+      <Label label="Tipo" :feedback="errors.tipo" class="col-span-2">
         <Select
           v-bind="tipoAttrs"
           v-model="tipo"
@@ -17,16 +17,16 @@
           fluid
         />
       </Label>
-      <div class="flex items-center mt-6">
-        <Checkbox v-bind="ehWhatsAppAttrs" v-model="ehWhatsApp" binary input-id="eh-whatsapp" />
-        <label for="eh-whatsapp" class="ml-2">É WhatsApp</label>
-      </div>
       <Label label="Telefone" :feedback="errors.fone">
         <InputTelefone v-bind="foneAttrs" v-model="fone" :invalid="!!errors.fone" fluid />
       </Label>
       <Label label="E-mail" :feedback="errors.email">
         <InputText v-bind="emailAttrs" v-model="email" :invalid="!!errors.email" fluid />
       </Label>
+      <div class="flex items-center">
+        <Checkbox v-bind="ehWhatsAppAttrs" v-model="ehWhatsApp" binary input-id="eh-whatsapp" />
+        <label for="eh-whatsapp" class="ml-2">WhatsApp</label>
+      </div>
     </div>
     <template #footer>
       <Button :label="typeof index === 'number' ? 'Atualizar' : 'Adicionar'" @click="tentaSalvar" />
