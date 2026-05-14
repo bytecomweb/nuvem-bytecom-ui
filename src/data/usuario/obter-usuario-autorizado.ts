@@ -12,6 +12,8 @@ type ObterUsuarioAutorizadoResposta = {
       id: number;
       cnpj: string;
       cargo: 'ADMIN' | 'GERENTE' | 'NORMAL' | string;
+      tabelaPrecoId?: number | null;
+      podeComprar?: boolean;
     }>;
   };
 };

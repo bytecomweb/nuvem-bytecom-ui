@@ -11,6 +11,7 @@ type AtualizarPessoaParametros = {
   cpfCnpj?: string;
   email?: string;
   telefone?: string;
+  tabelaPrecoId?: number | null;
   enquadramentoTributario?: PessoaEnquadramentoTributario;
   inscricaoEstadual?: string;
   inscricaoMunicipal?: string;

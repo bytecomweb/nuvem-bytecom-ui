@@ -4,4 +4,5 @@ export type Empresa = {
   nomeFantasia: string;
   cnpj: string;
   status: string;
+  tabelaPrecoId?: number | null;
 };

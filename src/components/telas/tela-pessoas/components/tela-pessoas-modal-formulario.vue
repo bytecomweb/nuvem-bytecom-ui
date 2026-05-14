@@ -44,6 +44,19 @@
           :invalid="!!errors.telefone"
         />
       </Label>
+      <Label
+        v-if="ehAdmin"
+        label="Tabela de preço"
+        :feedback="errors.tabelaPrecoId"
+        class="col-span-2"
+      >
+        <InputNumber
+          v-bind="tabelaPrecoIdAttrs"
+          v-model="tabelaPrecoId"
+          fluid
+          :invalid="!!errors.tabelaPrecoId"
+        />
+      </Label>
       <template v-if="tipoPessoa === 'juridica'">
         <Label
           label="Enquadramento Tributário"
@@ -145,14 +158,18 @@ import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
 import apenasNumeros from '@/utils/texto/apenas-numeros';
 import { toTypedSchema } from '@vee-validate/zod';
 import { Button, Dialog, InputText, Select } from 'primevue';
+import { InputNumber } from 'primevue';
 import { useForm } from 'vee-validate';
 import { computed, ref, watch } from 'vue';
+import z from 'zod';
 
 const visivel = defineModel<boolean>('visivel', {
   required: true,
 });
 
-const { defineField, resetForm, errors, handleSubmit } = useForm({
+const { defineField, resetForm, errors, handleSubmit } = useForm<
+  z.infer<typeof pessoaFormularioSchema>
+>({
   name: 'pessoa-formulario',
   validationSchema: toTypedSchema(pessoaFormularioSchema),
   initialValues: {
@@ -160,12 +177,18 @@ const { defineField, resetForm, errors, handleSubmit } = useForm({
     empresasParaRemover: [],
     enderecos: [],
     contatos: [],
+    tabelaPrecoId: null,
   },
 });
 
-const { empresaSelecionada, pessoa } = defineProps<{
+const {
+  empresaSelecionada,
+  pessoa,
+  ehAdmin = false,
+} = defineProps<{
   pessoa?: Pessoa;
   empresaSelecionada: Empresa;
+  ehAdmin?: boolean;
   cadastrarTitulo: string;
   atualizarTitulo: string;
   empresasLabel: string;
@@ -187,6 +210,7 @@ const [enquadramentoTributario, enquadramentoTributarioAttrs] =
   defineField('enquadramentoTributario');
 const [inscricaoEstadual, inscricaoEstadualAttrs] = defineField('inscricaoEstadual');
 const [inscricaoMunicipal, inscricaoMunicipalAttrs] = defineField('inscricaoMunicipal');
+const [tabelaPrecoId, tabelaPrecoIdAttrs] = defineField('tabelaPrecoId');
 
 const enquadramentoTributarioOpcoes = [
   { value: 'LUCRO_REAL_OU_PRESUMIDO', label: 'Lucro Real/Presumido' },
@@ -217,10 +241,11 @@ watch(visivel, () => {
         nomeFantasia: pessoa.nomeFantasia,
         nomeRazao: pessoa.nomeRazao,
         telefone: pessoa.telefone,
+        tabelaPrecoId: pessoa.tabelaPrecoId ?? null,
         enquadramentoTributario: pessoa.enquadramentoTributario,
         inscricaoEstadual: pessoa.inscricaoEstadual,
         inscricaoMunicipal: pessoa.inscricaoMunicipal,
-      },
+      } as z.infer<typeof pessoaFormularioSchema>,
     });
   } else {
     resetForm(
@@ -228,7 +253,8 @@ watch(visivel, () => {
         values: {
           empresasParaAdicionar: [empresaSelecionada],
           empresasParaRemover: [],
-        },
+          tabelaPrecoId: null,
+        } as unknown as z.infer<typeof pessoaFormularioSchema>,
       },
       {
         force: true,
@@ -288,6 +314,10 @@ const tentaSalvar = handleSubmit(async (dados) => {
       dados.inscricaoMunicipal = undefined;
     }
 
+    if (!ehAdmin) {
+      dados.tabelaPrecoId = undefined;
+    }
+
     salvando.value = true;
 
     if (pessoa) {
@@ -301,6 +331,11 @@ const tentaSalvar = handleSubmit(async (dados) => {
         cpfCnpj: dados.cpfCnpj,
         email: dados.email,
         telefone: dados.telefone || undefined,
+        tabelaPrecoId: ehAdmin
+          ? dados.tabelaPrecoId === undefined
+            ? undefined
+            : dados.tabelaPrecoId
+          : undefined,
         enquadramentoTributario: dados.enquadramentoTributario || undefined,
         inscricaoEstadual: dados.inscricaoEstadual || undefined,
         inscricaoMunicipal: dados.inscricaoMunicipal || undefined,

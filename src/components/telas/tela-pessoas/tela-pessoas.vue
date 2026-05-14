@@ -30,6 +30,7 @@
     v-model:visivel="modalFormulario.visivel"
     :pessoa="modalFormulario.pessoa"
     :empresa-selecionada
+    :eh-admin
     :cadastrar-titulo
     :atualizar-titulo
     :empresas-label
@@ -71,6 +72,7 @@ export type TelaPessoasProps = {
 const {
   titulo = 'Pessoas',
   bearerToken,
+  ehAdmin = false,
   cadastrarLabel = 'Cadastrar pessoa',
   naoEncontradoLabel = 'Nenhuma pessoa encontrada.',
   atualizarTitulo = 'Atualizar pessoa',

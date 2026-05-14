@@ -41,6 +41,13 @@ export const pessoaFormularioSchema = z
         message: CAMPO_INVALIDO,
       }),
     telefone: z.string().optional().nullable(),
+    tabelaPrecoId: z
+      .number({
+        invalid_type_error: CAMPO_INVALIDO,
+      })
+      .int()
+      .optional()
+      .nullable(),
     enquadramentoTributario: pessoaEnquadramentoTributarioSchema.optional().nullable(),
     inscricaoEstadual: z.string().optional().nullable(),
     inscricaoMunicipal: z.string().optional().nullable(),
