@@ -34,6 +34,6 @@ export const pessoaEnderecoFormularioSchema = z.object({
     })
     .min(2, { message: CAMPO_INVALIDO })
     .max(2, { message: CAMPO_INVALIDO }),
-  complemento: z.string().optional(),
+  complemento: z.string().optional().nullable(),
   numero: z.string().optional(),
 });
