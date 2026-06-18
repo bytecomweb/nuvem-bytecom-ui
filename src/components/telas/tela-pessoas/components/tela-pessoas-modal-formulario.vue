@@ -48,12 +48,11 @@
         v-if="ehAdmin"
         label="Tabela de preço"
         :feedback="errors.tabelaPrecoId"
-        class="col-span-2"
+        class="col-span-5"
       >
-        <InputNumber
-          v-bind="tabelaPrecoIdAttrs"
+        <SelectTabelaPreco
           v-model="tabelaPrecoId"
-          fluid
+          :empresa-id="empresaSelecionada.id"
           :invalid="!!errors.tabelaPrecoId"
         />
       </Label>
@@ -145,6 +144,7 @@ import InputCpfOuCnpj from '@/components/inputs/input-cpf-ou-cnpj.vue';
 import InputTelefone from '@/components/inputs/input-telefone.vue';
 import Label from '@/components/label.vue';
 import ModalEmpresasFormulario from '@/components/modals/modal-empresas-formulario.vue';
+import SelectTabelaPreco from '@/components/selects/select-tabela-preco.vue';
 import TelaPessoasModalContatos from '@/components/telas/tela-pessoas/components/tela-pessoas-modal-contatos.vue';
 import TelaPessoasModalEnderecos from '@/components/telas/tela-pessoas/components/tela-pessoas-modal-enderecos.vue';
 import { pessoaFormularioSchema } from '@/components/telas/tela-pessoas/schemas/pessoa-formulario-schema';
@@ -158,7 +158,6 @@ import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
 import apenasNumeros from '@/utils/texto/apenas-numeros';
 import { toTypedSchema } from '@vee-validate/zod';
 import { Button, Dialog, InputText, Select } from 'primevue';
-import { InputNumber } from 'primevue';
 import { useForm } from 'vee-validate';
 import { computed, ref, watch } from 'vue';
 import z from 'zod';
@@ -210,7 +209,7 @@ const [enquadramentoTributario, enquadramentoTributarioAttrs] =
   defineField('enquadramentoTributario');
 const [inscricaoEstadual, inscricaoEstadualAttrs] = defineField('inscricaoEstadual');
 const [inscricaoMunicipal, inscricaoMunicipalAttrs] = defineField('inscricaoMunicipal');
-const [tabelaPrecoId, tabelaPrecoIdAttrs] = defineField('tabelaPrecoId');
+const [tabelaPrecoId] = defineField('tabelaPrecoId');
 
 const enquadramentoTributarioOpcoes = [
   { value: 'LUCRO_REAL_OU_PRESUMIDO', label: 'Lucro Real/Presumido' },

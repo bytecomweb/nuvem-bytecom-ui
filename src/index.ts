@@ -24,6 +24,7 @@ import TelaLogin from '@/components/telas/tela-login/tela-login.vue';
 import CheckboxComLabel from '@/components/inputs/checkbox-com-label.vue';
 import InputMask from '@/components/inputs/input-mask.vue';
 import SelectEmpresa from '@/components/selects/select-empresa.vue';
+import SelectTabelaPreco from '@/components/selects/select-tabela-preco.vue';
 import InputCep from '@/components/inputs/input-cep.vue';
 import InputCpfOuCnpj from '@/components/inputs/input-cpf-ou-cnpj.vue';
 import InputTelefone from '@/components/inputs/input-telefone.vue';
@@ -49,6 +50,7 @@ export {
   CheckboxComLabel,
   InputMask,
   SelectEmpresa,
+  SelectTabelaPreco,
   InputCpfOuCnpj,
   InputCep,
   InputTelefone,
