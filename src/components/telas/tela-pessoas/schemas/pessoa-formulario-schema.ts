@@ -41,17 +41,10 @@ export const pessoaFormularioSchema = z
         message: CAMPO_INVALIDO,
       }),
     telefone: z.string().optional().nullable(),
-    tabelaPrecoId: z
-      .number({
-        invalid_type_error: CAMPO_INVALIDO,
-      })
-      .int()
-      .optional()
-      .nullable(),
     enquadramentoTributario: pessoaEnquadramentoTributarioSchema.optional().nullable(),
     inscricaoEstadual: z.string().optional().nullable(),
     inscricaoMunicipal: z.string().optional().nullable(),
-    empresasParaAdicionar: z.array(empresaSchema),
+    empresas: z.array(empresaSchema),
     empresasParaRemover: z.array(empresaSchema),
     enderecos: z.array(pessoaEnderecoFormularioSchema),
     contatos: z.array(pessoaContatoFormularioSchema),

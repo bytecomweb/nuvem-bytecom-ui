@@ -13,11 +13,13 @@ export default async function cadastrarPessoa(
     cpfCnpj: dados.cpfCnpj,
     email: dados.email,
     telefone: dados.telefone || undefined,
-    tabelaPrecoId: dados.tabelaPrecoId === undefined ? undefined : dados.tabelaPrecoId,
     enquadramentoTributario: dados.enquadramentoTributario || undefined,
     inscricaoEstadual: dados.inscricaoEstadual || undefined,
     inscricaoMunicipal: dados.inscricaoMunicipal || undefined,
-    empresaIds: dados.empresasParaAdicionar.map(({ id }) => id),
+    empresas: dados.empresas.map(({ id, tabelaPrecoId }) => ({
+      id,
+      tabelaPrecoId: tabelaPrecoId ?? null,
+    })),
     enderecos: dados.enderecos.map((endereco) => ({
       tipo: endereco.tipo,
       logradouro: endereco.logradouro,

@@ -44,18 +44,6 @@
           :invalid="!!errors.telefone"
         />
       </Label>
-      <Label
-        v-if="ehAdmin"
-        label="Tabela de preço"
-        :feedback="errors.tabelaPrecoId"
-        class="col-span-5"
-      >
-        <SelectTabelaPreco
-          v-model="tabelaPrecoId"
-          :empresa-id="empresaSelecionada.id"
-          :invalid="!!errors.tabelaPrecoId"
-        />
-      </Label>
       <template v-if="tipoPessoa === 'juridica'">
         <Label
           label="Enquadramento Tributário"
@@ -124,9 +112,10 @@
   <ModalEmpresasFormulario
     v-model:visivel="modalEmpresasFormularioVisivel"
     :titulo="empresasLabel"
-    para-adicionar-key="empresasParaAdicionar"
+    empresas-key="empresas"
     para-remover-key="empresasParaRemover"
-    :empresas="pessoa?.empresas"
+    :empresa-ids-originais="empresaIdsOriginais"
+    :empresa-ids-com-permissao-tabela-preco="empresaIdsComPermissaoTabelaPreco"
   />
   <TelaPessoasModalEnderecos
     v-model:visivel="modalEnderecosFormularioVisivel"
@@ -144,7 +133,6 @@ import InputCpfOuCnpj from '@/components/inputs/input-cpf-ou-cnpj.vue';
 import InputTelefone from '@/components/inputs/input-telefone.vue';
 import Label from '@/components/label.vue';
 import ModalEmpresasFormulario from '@/components/modals/modal-empresas-formulario.vue';
-import SelectTabelaPreco from '@/components/selects/select-tabela-preco.vue';
 import TelaPessoasModalContatos from '@/components/telas/tela-pessoas/components/tela-pessoas-modal-contatos.vue';
 import TelaPessoasModalEnderecos from '@/components/telas/tela-pessoas/components/tela-pessoas-modal-enderecos.vue';
 import { pessoaFormularioSchema } from '@/components/telas/tela-pessoas/schemas/pessoa-formulario-schema';
@@ -172,22 +160,22 @@ const { defineField, resetForm, errors, handleSubmit } = useForm<
   name: 'pessoa-formulario',
   validationSchema: toTypedSchema(pessoaFormularioSchema),
   initialValues: {
-    empresasParaAdicionar: [],
+    empresas: [],
     empresasParaRemover: [],
     enderecos: [],
     contatos: [],
-    tabelaPrecoId: null,
   },
 });
 
 const {
   empresaSelecionada,
   pessoa,
-  ehAdmin = false,
+  empresaIdsComPermissaoTabelaPreco = [],
 } = defineProps<{
   pessoa?: Pessoa;
   empresaSelecionada: Empresa;
   ehAdmin?: boolean;
+  empresaIdsComPermissaoTabelaPreco?: number[];
   cadastrarTitulo: string;
   atualizarTitulo: string;
   empresasLabel: string;
@@ -200,6 +188,9 @@ const emit = defineEmits<{
   'redefinir-senha': [pessoaId: number];
 }>();
 
+const empresaIdsOriginais = computed(() => new Set(pessoa?.empresas.map((p) => p.empresaId) ?? []));
+const empresaIdsComPermissaoSet = computed(() => new Set(empresaIdsComPermissaoTabelaPreco));
+
 const [nomeRazao, nomeRazaoAttrs] = defineField('nomeRazao');
 const [nomeFantasia, nomeFantasiaAttrs] = defineField('nomeFantasia');
 const [cpfCnpj, cpfCnpjAttrs] = defineField('cpfCnpj');
@@ -209,7 +200,6 @@ const [enquadramentoTributario, enquadramentoTributarioAttrs] =
   defineField('enquadramentoTributario');
 const [inscricaoEstadual, inscricaoEstadualAttrs] = defineField('inscricaoEstadual');
 const [inscricaoMunicipal, inscricaoMunicipalAttrs] = defineField('inscricaoMunicipal');
-const [tabelaPrecoId] = defineField('tabelaPrecoId');
 
 const enquadramentoTributarioOpcoes = [
   { value: 'LUCRO_REAL_OU_PRESUMIDO', label: 'Lucro Real/Presumido' },
@@ -225,7 +215,10 @@ watch(visivel, () => {
   if (pessoa) {
     resetForm({
       values: {
-        empresasParaAdicionar: [],
+        empresas: pessoa.empresas.map((pe) => ({
+          ...pe.empresa,
+          tabelaPrecoId: pe.tabelaPrecoId ?? null,
+        })),
         empresasParaRemover: [],
         cpfCnpj: pessoa.cpfCnpj,
         contatos: pessoa.contatos.map((contato) => ({
@@ -240,7 +233,6 @@ watch(visivel, () => {
         nomeFantasia: pessoa.nomeFantasia,
         nomeRazao: pessoa.nomeRazao,
         telefone: pessoa.telefone,
-        tabelaPrecoId: pessoa.tabelaPrecoId ?? null,
         enquadramentoTributario: pessoa.enquadramentoTributario,
         inscricaoEstadual: pessoa.inscricaoEstadual,
         inscricaoMunicipal: pessoa.inscricaoMunicipal,
@@ -250,9 +242,8 @@ watch(visivel, () => {
     resetForm(
       {
         values: {
-          empresasParaAdicionar: [empresaSelecionada],
+          empresas: [empresaSelecionada],
           empresasParaRemover: [],
-          tabelaPrecoId: null,
         } as unknown as z.infer<typeof pessoaFormularioSchema>,
       },
       {
@@ -270,7 +261,7 @@ const salvando = ref(false);
 
 const tentaSalvar = handleSubmit(async (dados) => {
   try {
-    if ((!dados.empresasParaAdicionar || dados.empresasParaAdicionar.length === 0) && !pessoa) {
+    if ((!dados.empresas || dados.empresas.length === 0) && !pessoa) {
       return erro('Essa pessoa deve estar associada à uma empresa');
     }
 
@@ -313,14 +304,10 @@ const tentaSalvar = handleSubmit(async (dados) => {
       dados.inscricaoMunicipal = undefined;
     }
 
-    if (!ehAdmin) {
-      dados.tabelaPrecoId = undefined;
-    }
-
     salvando.value = true;
 
     if (pessoa) {
-      const empresaIdsOriginais = new Set(pessoa.empresas.map(({ empresaId }) => empresaId));
+      const empresaIdsParaRemover = new Set(dados.empresasParaRemover.map((e) => e.id));
       const enderecoIdsAtuais = new Set(dados.enderecos.map((e) => e.id).filter(Boolean));
       const contatoIdsAtuais = new Set(dados.contatos.map((c) => c.id).filter(Boolean));
 
@@ -330,17 +317,15 @@ const tentaSalvar = handleSubmit(async (dados) => {
         cpfCnpj: dados.cpfCnpj,
         email: dados.email,
         telefone: dados.telefone || undefined,
-        tabelaPrecoId: ehAdmin
-          ? dados.tabelaPrecoId === undefined
-            ? undefined
-            : dados.tabelaPrecoId
-          : undefined,
         enquadramentoTributario: dados.enquadramentoTributario || undefined,
         inscricaoEstadual: dados.inscricaoEstadual || undefined,
         inscricaoMunicipal: dados.inscricaoMunicipal || undefined,
-        empresasParaAdicionar: dados.empresasParaAdicionar
-          .filter((e) => !empresaIdsOriginais.has(e.id))
-          .map((e) => e.id),
+        empresas: dados.empresas
+          .filter((e) => !empresaIdsParaRemover.has(e.id))
+          .map((e) => ({
+            id: e.id,
+            ...(empresaIdsComPermissaoSet.value.has(e.id) ? { tabelaPrecoId: e.tabelaPrecoId ?? null } : {}),
+          })),
         empresasParaRemover: dados.empresasParaRemover.map((e) => e.id),
         enderecos: dados.enderecos.map((e) => ({
           id: e.id,

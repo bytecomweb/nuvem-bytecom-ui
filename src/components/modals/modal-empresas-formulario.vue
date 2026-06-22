@@ -34,6 +34,18 @@
           </div>
         </template>
       </Column>
+      <Column v-if="empresaIdsComPermissaoTabelaPreco?.length" header="Tabela de preço">
+        <template #body="{ data }">
+          <div class="w-56">
+            <SelectTabelaPreco
+              v-if="empresaIdsComPermissaoSet.has(data.empresa.id)"
+              v-model="fields[data.index].value.tabelaPrecoId"
+              :empresa-id="data.empresa.id"
+            />
+            <span v-else class="text-gray-400">—</span>
+          </div>
+        </template>
+      </Column>
       <Column>
         <template #body="{ data }">
           <Button
@@ -50,30 +62,32 @@
 <script lang="ts" setup>
 import NenhumConteudoEncontrado from '@/components/nenhum-conteudo-encontrado.vue';
 import SelectEmpresa from '@/components/selects/select-empresa.vue';
+import SelectTabelaPreco from '@/components/selects/select-tabela-preco.vue';
 import useNotification from '@/composables/use-notification';
 import { Empresa } from '@/types/modelos/empresa';
-import { PessoaEmpresa } from '@/types/modelos/pessoa-empresa';
 import { Avatar, Button, Column, DataTable, Dialog } from 'primevue';
 import { useConfirm } from 'primevue/useconfirm';
 import { useFieldArray } from 'vee-validate';
 import { computed, nextTick, ref, watch } from 'vue';
 
-const { paraAdicionarKey, paraRemoverKey, titulo, empresas } = defineProps<{
-  paraAdicionarKey: string;
-  paraRemoverKey: string;
-  titulo: string;
-  empresas?: PessoaEmpresa[];
-}>();
+const { empresasKey, paraRemoverKey, titulo, empresaIdsOriginais, empresaIdsComPermissaoTabelaPreco } =
+  defineProps<{
+    empresasKey: string;
+    paraRemoverKey: string;
+    titulo: string;
+    empresaIdsOriginais?: Set<number>;
+    empresaIdsComPermissaoTabelaPreco?: number[];
+  }>();
+
+const empresaIdsComPermissaoSet = computed(() => new Set(empresaIdsComPermissaoTabelaPreco));
 
 const visivel = defineModel<boolean>('visivel', {
   required: true,
 });
 
-const {
-  fields: paraAdicionarFields,
-  push: paraAdicionarPush,
-  remove: paraAdicionarRemove,
-} = useFieldArray<Empresa>(paraAdicionarKey);
+type EmpresaComTabela = Empresa & { tabelaPrecoId?: number | null };
+
+const { fields, push, remove } = useFieldArray<EmpresaComTabela>(empresasKey);
 
 const {
   fields: paraRemoverFields,
@@ -89,21 +103,19 @@ const { aviso } = useNotification();
 watch(empresaInterna, () => {
   nextTick(() => {
     if (visivel.value && empresaInterna.value) {
-      const empresaParaRemoverIndex = paraRemoverFields.value.findIndex(
-        (empresa) => empresa.value.id === empresaInterna.value?.id
-      );
+      const id = empresaInterna.value.id;
 
-      if (empresaParaRemoverIndex >= 0) {
-        paraRemoverRemove(empresaParaRemoverIndex);
+      const indexParaRemover = paraRemoverFields.value.findIndex((f) => f.value.id === id);
+
+      if (indexParaRemover >= 0) {
+        paraRemoverRemove(indexParaRemover);
       } else {
-        const empresaJaAdicionada = paraAdicionarFields.value.some(
-          (empresa) => empresa.value.id === empresaInterna.value?.id
-        );
+        const jaExiste = fields.value.some((f) => f.value.id === id);
 
-        if (empresaJaAdicionada) {
+        if (jaExiste) {
           aviso('Empresa já adicionada');
         } else {
-          paraAdicionarPush(empresaInterna.value);
+          push({ ...empresaInterna.value, tabelaPrecoId: null });
         }
       }
 
@@ -113,40 +125,25 @@ watch(empresaInterna, () => {
 });
 
 type EmpresaParaMostrar = {
-  index?: number;
+  index: number;
   empresa: Empresa;
 };
 
-const empresasParaMostrar = computed(() => {
-  const empresasExistentes = (empresas || [])
-    .filter(({ empresaId }) => {
-      const empresaParaRemover = paraRemoverFields.value.some(
-        (empresa) => empresa.value.id === empresaId
-      );
-
-      return !empresaParaRemover;
-    })
-    .map<EmpresaParaMostrar>(({ empresa }) => ({
-      empresa,
-    }));
-
-  const empresasTratadas = paraAdicionarFields.value.map<EmpresaParaMostrar>((field, index) => ({
-    empresa: field.value,
-    index,
-  }));
-
-  return empresasTratadas.concat(empresasExistentes);
-});
+const empresasParaMostrar = computed(() =>
+  fields.value
+    .filter((f) => !paraRemoverFields.value.some((r) => r.value.id === f.value.id))
+    .map<EmpresaParaMostrar>((f, i) => ({ empresa: f.value, index: i }))
+);
 
 const removerEmpresa = ({ empresa, index }: EmpresaParaMostrar) => {
   if (empresasParaMostrar.value.length === 1) {
     return aviso('É preciso ter ao menos uma empresa adicionada');
   }
 
-  if (typeof index === 'number') {
-    paraAdicionarRemove(index);
-  } else {
+  if (empresaIdsOriginais?.has(empresa.id)) {
     paraRemoverPush(empresa);
+  } else {
+    remove(index);
   }
 };
 

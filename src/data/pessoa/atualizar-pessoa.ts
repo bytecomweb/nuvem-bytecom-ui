@@ -11,11 +11,10 @@ type AtualizarPessoaParametros = {
   cpfCnpj?: string;
   email?: string;
   telefone?: string;
-  tabelaPrecoId?: number | null;
   enquadramentoTributario?: PessoaEnquadramentoTributario;
   inscricaoEstadual?: string;
   inscricaoMunicipal?: string;
-  empresasParaAdicionar?: number[];
+  empresas?: { id: number; tabelaPrecoId?: number | null }[];
   empresasParaRemover?: number[];
   enderecos?: {
     id?: number;

@@ -9,8 +9,8 @@ const app = createApp(App);
 
 app.use(NuvemBytecomUi, {
   api: {
-    // baseURL: 'https://nuvembytecom.com.br/sistema/api/v1',
-    baseURL: 'http://localhost:3000/api/v1',
+    baseURL: 'https://92.112.178.121/sistema/api/v1',
+    // baseURL: 'http://localhost:3000/api/v1',
   },
 });
 

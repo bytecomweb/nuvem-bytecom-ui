@@ -26,12 +26,13 @@ const modelValue = defineModel<number | null | undefined>({
 const props = defineProps<{
   empresaId: number;
   invalid?: boolean;
+  bearerToken?: string;
 }>();
 
 const empresaId = toRef(() => props.empresaId);
 const invalid = toRef(() => props.invalid);
 
-const api = useApi();
+const api = useApi(props.bearerToken);
 
 const carregando = ref(false);
 const tabelas = ref<TabelaPreco[]>([]);

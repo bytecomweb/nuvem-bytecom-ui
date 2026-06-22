@@ -31,6 +31,7 @@
     :pessoa="modalFormulario.pessoa"
     :empresa-selecionada
     :eh-admin
+    :empresa-ids-com-permissao-tabela-preco="empresaIdsComPermissaoTabelaPreco"
     :cadastrar-titulo
     :atualizar-titulo
     :empresas-label
@@ -54,12 +55,13 @@ import redefinirSenhaPorPessoaId from '@/data/pessoa/redefinir-senha-por-pessoa-
 import { Empresa } from '@/types/modelos/empresa';
 import { Pessoa } from '@/types/modelos/pessoa';
 import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
-import { reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 
 export type TelaPessoasProps = {
   titulo?: string;
   bearerToken?: string;
   ehAdmin?: boolean;
+  empresasDoUsuario?: Array<{ id: number; cargo: 'GERENTE' | 'NORMAL' }>;
   cadastrarLabel?: string;
   naoEncontradoLabel?: string;
   atualizarTitulo?: string;
@@ -73,6 +75,7 @@ const {
   titulo = 'Pessoas',
   bearerToken,
   ehAdmin = false,
+  empresasDoUsuario,
   cadastrarLabel = 'Cadastrar pessoa',
   naoEncontradoLabel = 'Nenhuma pessoa encontrada.',
   atualizarTitulo = 'Atualizar pessoa',
@@ -81,6 +84,14 @@ const {
   enderecosLabel = 'Endereços da pessoa',
   contatosLabel = 'Contatos da pessoa',
 } = defineProps<TelaPessoasProps>();
+
+const empresaIdsComPermissaoTabelaPreco = computed(() => {
+  if (!empresasDoUsuario?.length) return [];
+  if (ehAdmin) return empresasDoUsuario.map((e) => e.id);
+  return empresasDoUsuario
+    .filter((e) => e.cargo === 'GERENTE')
+    .map((e) => e.id);
+});
 
 const api = useApi(bearerToken);
 

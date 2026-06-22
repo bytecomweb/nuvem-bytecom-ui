@@ -5,4 +5,5 @@ export type PessoaEmpresa = {
   pessoaId: number;
   podeComprar?: boolean;
   empresa: Empresa;
+  tabelaPrecoId?: number | null;
 };
