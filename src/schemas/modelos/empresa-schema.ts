@@ -14,4 +14,5 @@ export const empresaSchema = z.object({
     .int()
     .optional()
     .nullable(),
+  podeComprar: z.boolean().optional(),
 });

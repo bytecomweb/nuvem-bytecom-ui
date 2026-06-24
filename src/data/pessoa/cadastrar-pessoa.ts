@@ -16,9 +16,10 @@ export default async function cadastrarPessoa(
     enquadramentoTributario: dados.enquadramentoTributario || undefined,
     inscricaoEstadual: dados.inscricaoEstadual || undefined,
     inscricaoMunicipal: dados.inscricaoMunicipal || undefined,
-    empresas: dados.empresas.map(({ id, tabelaPrecoId }) => ({
+    empresas: dados.empresas.map(({ id, tabelaPrecoId, podeComprar }) => ({
       id,
       tabelaPrecoId: tabelaPrecoId ?? null,
+      podeComprar: podeComprar ?? false,
     })),
     enderecos: dados.enderecos.map((endereco) => ({
       tipo: endereco.tipo,

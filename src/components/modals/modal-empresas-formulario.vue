@@ -46,6 +46,22 @@
           </div>
         </template>
       </Column>
+      <Column header="Pode comprar">
+        <template #body="{ data }">
+          <div v-if="empresaIdsComPermissaoSet.has(data.empresa.id)" class="flex justify-center">
+            <Checkbox
+              v-model="fields[data.index].value.podeComprar"
+              binary
+            />
+          </div>
+          <div v-else class="flex justify-center">
+            <Tag
+              :value="fields[data.index].value.podeComprar ? 'Sim' : 'Não'"
+              :severity="fields[data.index].value.podeComprar ? 'success' : 'danger'"
+            />
+          </div>
+        </template>
+      </Column>
       <Column>
         <template #body="{ data }">
           <Button
@@ -65,7 +81,7 @@ import SelectEmpresa from '@/components/selects/select-empresa.vue';
 import SelectTabelaPreco from '@/components/selects/select-tabela-preco.vue';
 import useNotification from '@/composables/use-notification';
 import { Empresa } from '@/types/modelos/empresa';
-import { Avatar, Button, Column, DataTable, Dialog } from 'primevue';
+import { Avatar, Button, Checkbox, Column, DataTable, Dialog, Tag } from 'primevue';
 import { useConfirm } from 'primevue/useconfirm';
 import { useFieldArray } from 'vee-validate';
 import { computed, nextTick, ref, watch } from 'vue';
@@ -85,9 +101,9 @@ const visivel = defineModel<boolean>('visivel', {
   required: true,
 });
 
-type EmpresaComTabela = Empresa & { tabelaPrecoId?: number | null };
+type EmpresaFormulario = Empresa & { tabelaPrecoId?: number | null; podeComprar?: boolean };
 
-const { fields, push, remove } = useFieldArray<EmpresaComTabela>(empresasKey);
+const { fields, push, remove } = useFieldArray<EmpresaFormulario>(empresasKey);
 
 const {
   fields: paraRemoverFields,
@@ -115,7 +131,7 @@ watch(empresaInterna, () => {
         if (jaExiste) {
           aviso('Empresa já adicionada');
         } else {
-          push({ ...empresaInterna.value, tabelaPrecoId: null });
+          push({ ...empresaInterna.value, tabelaPrecoId: null, podeComprar: false });
         }
       }
 

@@ -218,6 +218,7 @@ watch(visivel, () => {
         empresas: pessoa.empresas.map((pe) => ({
           ...pe.empresa,
           tabelaPrecoId: pe.tabelaPrecoId ?? null,
+          podeComprar: pe.podeComprar,
         })),
         empresasParaRemover: [],
         cpfCnpj: pessoa.cpfCnpj,
@@ -324,7 +325,9 @@ const tentaSalvar = handleSubmit(async (dados) => {
           .filter((e) => !empresaIdsParaRemover.has(e.id))
           .map((e) => ({
             id: e.id,
-            ...(empresaIdsComPermissaoSet.value.has(e.id) ? { tabelaPrecoId: e.tabelaPrecoId ?? null } : {}),
+            ...(empresaIdsComPermissaoSet.value.has(e.id)
+              ? { tabelaPrecoId: e.tabelaPrecoId ?? null, podeComprar: e.podeComprar ?? false }
+              : {}),
           })),
         empresasParaRemover: dados.empresasParaRemover.map((e) => e.id),
         enderecos: dados.enderecos.map((e) => ({

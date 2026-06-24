@@ -14,7 +14,7 @@ type AtualizarPessoaParametros = {
   enquadramentoTributario?: PessoaEnquadramentoTributario;
   inscricaoEstadual?: string;
   inscricaoMunicipal?: string;
-  empresas?: { id: number; tabelaPrecoId?: number | null }[];
+  empresas?: { id: number; tabelaPrecoId?: number | null; podeComprar?: boolean }[];
   empresasParaRemover?: number[];
   enderecos?: {
     id?: number;
