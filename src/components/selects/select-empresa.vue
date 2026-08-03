@@ -6,7 +6,6 @@
     :loading="carregando"
     label-id="empresaSelecionada"
     v-model="modelValue"
-    :filter="filtro"
     :auto-filter-focus="false"
     reset-filter-on-clear
     ref="select"
@@ -15,6 +14,16 @@
     @before-hide="aoEsconder"
     @filter="(e) => (busca = e.value)"
   >
+    <template #header>
+      <div class="p-3">
+        <InputGroup>
+          <InputText fluid v-model="busca" @keydown.enter="tentaObterEmpresas" />
+          <InputGroupAddon @click="tentaObterEmpresas">
+            <span class="pi pi-search" />
+          </InputGroupAddon>
+        </InputGroup>
+      </div>
+    </template>
     <template #option="{ option }">
       {{ option.nomeRazao.length > 30 ? `${option.nomeRazao.slice(0, 30)}...` : option.nomeRazao }}
     </template>
@@ -26,7 +35,7 @@ import useNotification from '@/composables/use-notification';
 import obterEmpresasDoUsuario from '@/data/usuario/obter-empresas-do-usuario';
 import { Empresa } from '@/types/modelos/empresa';
 import obterErroDaRequisicao from '@/utils/requisicao/obter-erro-da-requisicao';
-import { Select } from 'primevue';
+import { InputGroup, InputGroupAddon, InputText, Select } from 'primevue';
 import { onMounted, ref, useTemplateRef, watch } from 'vue';
 
 const modelValue = defineModel<Empresa | undefined>({
@@ -57,9 +66,20 @@ async function tentaObterEmpresas() {
 
     const { dados } = await obterEmpresasDoUsuario(api, busca.value);
 
-    empresas.value = dados.map((empresa) => ({
-      ...empresa,
-    }));
+    if (modelValue.value) {
+      console.log(modelValue.value);
+
+      empresas.value = [
+        modelValue.value,
+        ...dados
+          .filter((empresa) => !modelValue.value || empresa.id !== modelValue.value.id)
+          .map((empresa) => ({
+            ...empresa,
+          })),
+      ];
+    } else {
+      empresas.value = dados;
+    }
 
     if (modelValue.value) {
       if (empresas.value.length === 0) {
@@ -106,7 +126,5 @@ const aoEsconder = () => {
 
 onMounted(tentaObterEmpresas);
 
-watch(busca, () => {
-  tentaObterEmpresas();
-});
+watch(modelValue, () => (busca.value = ''));
 </script>
