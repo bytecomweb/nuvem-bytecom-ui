@@ -235,6 +235,7 @@ const tentaSalvarUsuario = handleSubmit(async (dados) => {
         empresas: dados.empresas.map((empresa) => ({
           id: empresa.id,
           cargo: empresa.cargo,
+          local: empresa.local,
           apagar: empresa.apagar,
         })),
         sistemasParaAdicionar: dados.sistemasParaAdicionar,
